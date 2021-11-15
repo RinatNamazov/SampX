@@ -50,6 +50,7 @@ cmake --build .
 * Qt ([LGPL](http://doc.qt.io/qt-5/lgpl.html))
 * CMake ([New BSD License](https://github.com/Kitware/CMake/blob/master/Copyright.txt))
 * QDarkStyleSheet ([MIT License](https://github.com/ColinDuquesnoy/QDarkStyleSheet/blob/master/LICENSE.rst))
+* pe-parse ([MIT License](https://github.com/trailofbits/pe-parse/blob/master/LICENSE))
 
 ## License
 The source code is published under GPLv3, the license is available [here](LICENSE).
