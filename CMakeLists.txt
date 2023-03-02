@@ -64,7 +64,7 @@ file(GLOB SAMPX_TS
 if (UPDATE_TRANSLATION_SOURCES)
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR} ${SAMPX_TS})
 else()
-    qt5_add_translation(QM_FILES ${TRANSLATION_FILES})
+    qt5_add_translation(QM_FILES ${SAMPX_TS})
 endif()
 
 qt5_wrap_ui(UI_HEADERS ${SAMPX_UI})
@@ -95,7 +95,7 @@ target_include_directories(SampX PRIVATE
 target_link_libraries(SampX PRIVATE
     Qt5::Widgets
     Qt5::Network
-    pe-parse::pe-parser-library
+    pe-parse::pe-parse
 )
 
 install(TARGETS SampX DESTINATION .)
