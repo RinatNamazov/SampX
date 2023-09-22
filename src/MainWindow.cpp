@@ -266,6 +266,13 @@ void MainWindow::changeEvent(QEvent* event)
             case QEvent::LocaleChange:
                 loadLanguage(QLocale::system().name());
                 break;
+            case QEvent::ActivationChange:
+                if (isActiveWindow()) {
+                    pingTimer_->start();
+                } else {
+                    pingTimer_->stop();
+                }
+                break;
             default:
                 break;
         }
