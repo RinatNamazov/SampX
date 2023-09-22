@@ -1086,7 +1086,7 @@ void MainWindow::on_deleteProfileButton_clicked()
 void MainWindow::updateServerInfo()
 {
     // Todo: Add this to the settings.
-/*
+    /*
     // Ping only selected server.
     int row{ui_->servers->currentRow()};
     if (row != -1) {
@@ -1121,86 +1121,88 @@ void MainWindow::pingServerInTable(int row, bool useHttp)
     } else {
         sq = new SampQuery(serverAddress);
         addressRow->setData(Qt::UserRole, QVariant::fromValue(sq));
+
+        QTableWidgetItem* pingItem{ui_->servers->item(row, 2)};
+
+        QObject::connect(sq, &SampQuery::pingCalculated, this, [this, pingItem](int ping) {
+            QString pingStr{QString::number(ping)};
+
+            pingItem->setText(pingStr);
+
+            if (ui_->servers->item(ui_->servers->currentRow(), 2) == pingItem) {
+                ui_->serverPing->setText(pingStr);
+            }
+        });
+
+        QTableWidgetItem* hostnameItem{ui_->servers->item(row, 0)};
+        QTableWidgetItem* onlineItem{ui_->servers->item(row, 1)};
+        QTableWidgetItem* modeItem{ui_->servers->item(row, 3)};
+        QTableWidgetItem* languageItem{ui_->servers->item(row, 4)};
+
+        QObject::connect(sq,
+                         &SampQuery::serverInfoResponse,
+                         this,
+                         [this, serverAddress, hostnameItem, onlineItem, modeItem, languageItem](
+                             ServerInfoResponse si) {
+                             QString playersText{
+                                 QString("%1 / %2").arg(si.curPlayers).arg(si.maxPlayers)};
+
+                             hostnameItem->setText(si.hostname);
+                             onlineItem->setText(playersText);
+                             modeItem->setText(si.mode);
+                             languageItem->setText(si.language);
+
+                             if (si.isClosedServer) {
+                                 hostnameItem->setForeground(QBrush{ClosedServersColor});
+                             }
+
+                             if (ui_->servers->item(ui_->servers->currentRow(), 0) == hostnameItem) {
+                                 ui_->serverInfoBox->setTitle(tr("Server Information: ")
+                                                              + si.hostname);
+                                 ui_->serverPlayers->setText(playersText);
+                                 ui_->serverMode->setText(si.mode);
+                                 ui_->serverLanguage->setText(si.language);
+                             }
+                         });
+
+        QObject::connect(sq,
+                         &SampQuery::serverRulesResponse,
+                         this,
+                         [this, hostnameItem](QMap<QString, QString> rules) {
+                             if (ui_->servers->item(ui_->servers->currentRow(), 0) != hostnameItem) {
+                                 return;
+                             }
+
+                             ui_->serverMap->setText("-");
+                             ui_->serverVersion->setText("-");
+                             ui_->serverWeather->setText("-");
+                             ui_->serverUrl->setText("-");
+                             ui_->serverWorldTime->setText("-");
+
+                             for (auto it{rules.cbegin()}; it != rules.cend(); ++it) {
+                                 QString key{it.key()};
+                                 QString value{it.value()};
+
+                                 if (key == "mapname") {
+                                     ui_->serverMap->setText(value);
+                                 } else if (key == "version") {
+                                     ui_->serverVersion->setText(value);
+                                 } else if (key == "weather") {
+                                     ui_->serverWeather->setText(value);
+                                 } else if (key == "weburl") {
+                                     ui_->serverUrl->setText(
+                                         "<a href=\"http://" + value
+                                         + "\"><span style=\"text-decoration: none; color:white;\">"
+                                         + value + "</span></a>");
+                                 } else if (key == "worldtime") {
+                                     ui_->serverWorldTime->setText(value);
+                                 }
+                             }
+                         });
     }
 
-    QTableWidgetItem* pingItem{ui_->servers->item(row, 2)};
-    QObject::connect(sq, &SampQuery::pingCalculated, this, [this, pingItem](int ping) {
-        QString pingStr{QString::number(ping)};
-
-        pingItem->setText(pingStr);
-
-        if (ui_->servers->item(ui_->servers->currentRow(), 2) == pingItem) {
-            ui_->serverPing->setText(pingStr);
-        }
-    });
-
-    QTableWidgetItem* hostnameItem{ui_->servers->item(row, 0)};
-    QTableWidgetItem* onlineItem{ui_->servers->item(row, 1)};
-    QTableWidgetItem* modeItem{ui_->servers->item(row, 3)};
-    QTableWidgetItem* languageItem{ui_->servers->item(row, 4)};
-
-    QObject::connect(sq,
-                     &SampQuery::serverInfoResponse,
-                     this,
-                     [this, serverAddress, hostnameItem, onlineItem, modeItem, languageItem](
-                         ServerInfoResponse si) {
-                         QString playersText{
-                             QString("%1 / %2").arg(si.curPlayers).arg(si.maxPlayers)};
-
-                         hostnameItem->setText(si.hostname);
-                         onlineItem->setText(playersText);
-                         modeItem->setText(si.mode);
-                         languageItem->setText(si.language);
-
-                         if (si.isClosedServer) {
-                             hostnameItem->setForeground(QBrush{ClosedServersColor});
-                         }
-
-                         if (ui_->servers->item(ui_->servers->currentRow(), 0) == hostnameItem) {
-                             ui_->serverInfoBox->setTitle(tr("Server Information: ") + si.hostname);
-                             ui_->serverPlayers->setText(playersText);
-                             ui_->serverMode->setText(si.mode);
-                             ui_->serverLanguage->setText(si.language);
-                         }
-                     });
-
-    QObject::connect(sq,
-                     &SampQuery::serverRulesResponse,
-                     this,
-                     [this, hostnameItem](QMap<QString, QString> rules) {
-                         if (ui_->servers->item(ui_->servers->currentRow(), 0) != hostnameItem) {
-                             return;
-                         }
-
-                         ui_->serverMap->setText("-");
-                         ui_->serverVersion->setText("-");
-                         ui_->serverWeather->setText("-");
-                         ui_->serverUrl->setText("-");
-                         ui_->serverWorldTime->setText("-");
-
-                         for (auto it{rules.cbegin()}; it != rules.cend(); ++it) {
-                             QString key{it.key()};
-                             QString value{it.value()};
-
-                             if (key == "mapname") {
-                                 ui_->serverMap->setText(value);
-                             } else if (key == "version") {
-                                 ui_->serverVersion->setText(value);
-                             } else if (key == "weather") {
-                                 ui_->serverWeather->setText(value);
-                             } else if (key == "weburl") {
-                                 ui_->serverUrl->setText(
-                                     "<a href=\"http://" + value
-                                     + "\"><span style=\"text-decoration: none; color:white;\">"
-                                     + value + "</span></a>");
-                             } else if (key == "worldtime") {
-                                 ui_->serverWorldTime->setText(value);
-                             }
-                         }
-                     });
-
     if (useHttp) {
-        sq->requestHttpPing();
+        //sq->requestHttpPing();
     }
 
     for (int i{0}; i < 5; ++i) {
