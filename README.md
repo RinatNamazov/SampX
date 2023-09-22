@@ -31,12 +31,6 @@ https://www.blast.hk/threads/105888/
 * [Visual Studio](https://visualstudio.microsoft.com)
 * [Vcpkg](https://github.com/microsoft/vcpkg)
 
-#### Install libraries
-```bash
-vcpkg install qt5
-vcpkg install pe-parse
-```
-
 #### Building
 ```
 mkdir build
