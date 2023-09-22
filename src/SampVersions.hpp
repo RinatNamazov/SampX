@@ -21,6 +21,8 @@ enum class SampVersion {
     SAMP_037_R3,
     SAMP_037_R3_1,
     SAMP_037_R4,
+    SAMP_037_R4_2,
+    SAMP_037_R5,
     SAMP_03DL_R1
 };
 
