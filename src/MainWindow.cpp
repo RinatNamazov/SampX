@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget* parent)
     QCoreApplication::setOrganizationName("RINWARES");
     QCoreApplication::setOrganizationDomain("rinwares.com");
     QCoreApplication::setApplicationName("SampX");
-    QCoreApplication::setApplicationVersion("v.1.0.0-alpha");
+    QCoreApplication::setApplicationVersion("v.1.0.1-alpha");
 
     ui_->setupUi(this);
 

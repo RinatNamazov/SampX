@@ -1,6 +1,6 @@
 {
   "name": "sampx",
-  "version-semver": "1.0.0-alpha",
+  "version-semver": "1.0.1-alpha",
   "description": "SampX is the custom launcher of SA:MP.",
   "homepage": "https://github.com/RinatNamazov/SampX",
   "dependencies": [
