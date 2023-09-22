@@ -604,7 +604,7 @@ void MainWindow::on_actionAbout_triggered()
 SampX — %3<br/><br/>
 %4: <a href='https://rinwares.com'><span style="text-decoration: none; color:white;">rinwares.com</span></a><br/>
 VK: <a href='https://vk.com/rinwares'><span style="text-decoration: none; color:white;">vk.com/rinwares</span></a><br/>
-TG: <a href='https://t.me/rinwares'><span style="text-decoration: none; color:white;">t.me/rinwares</span></a><br/>
+TG: <a href='https://t.me/rinwares_official'><span style="text-decoration: none; color:white;">t.me/rinwares_official</span></a><br/>
 Discord: <a href='https://rinwares.com/discord'><span style="text-decoration: none; color:white;">rinwares.com/discord</span></a><br/>
 BlastHack: <a href='https://www.blast.hk/threads/105888/'><span style="text-decoration: none; color:white;">blast.hk/threads/105888/</span></a><br/><br/>
 %5: <a href='https://t.me/Rinat_Namazov'><span style="text-decoration: none; color:white;">Rinat Namazov</span></a><br/><br/>
