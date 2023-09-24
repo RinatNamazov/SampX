@@ -595,7 +595,7 @@ void MainWindow::on_actionSite_triggered()
 void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox msgBox(this);
-    msgBox.setWindowTitle(tr("RakCloud About"));
+    msgBox.setWindowTitle(tr("SampX About"));
     msgBox.setTextFormat(Qt::RichText);
     msgBox.setText(QString(R"(<p style='text-align:center'>
 <img src=':/icons/sampx_logo.png' height='100' align='center'>
@@ -612,7 +612,7 @@ BlastHack: <a href='https://www.blast.hk/threads/105888/'><span style="text-deco
 Copyright © 2021 RINWARES. All rights reserved.)")
                        .arg(tr("Version"),
                             QCoreApplication::applicationVersion(),
-                            tr("The custom launcher of SA:MP"),
+                            tr("The custom launcher of SA-MP"),
                             tr("Site"),
                             tr("Developer"),
                             tr("Donate")));

@@ -424,7 +424,7 @@
          <item row="2" column="0">
           <widget class="QLabel" name="adapterLabel">
            <property name="toolTip">
-            <string>Works only with RiNetworkAdapter.asi installed, can be used for a VPN</string>
+            <string>Works only with RiNetworkAdapter.asi installed, can be used for a VPN.</string>
            </property>
            <property name="text">
             <string>Adapter:</string>
@@ -485,7 +485,7 @@
          <item row="6" column="0">
           <widget class="QLabel" name="sampLabel">
            <property name="text">
-            <string>SA:MP:</string>
+            <string>SA-MP:</string>
            </property>
           </widget>
          </item>
@@ -631,7 +631,7 @@
   </action>
   <action name="actionSamp">
    <property name="text">
-    <string>SA:MP</string>
+    <string>SA-MP</string>
    </property>
   </action>
   <action name="actionDark">
@@ -655,14 +655,8 @@
     <string>Adapter (VPN)</string>
    </property>
   </action>
-  <action name="actionf">
-   <property name="text">
-    <string>f</string>
-   </property>
-  </action>
  </widget>
  <resources>
-  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>

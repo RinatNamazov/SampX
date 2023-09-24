@@ -43,7 +43,7 @@ SampVersion SampVersions::getVersionOfSampDll(const QString& filePath)
 
 QString SampVersions::getSampVersionAsString(SampVersion sampVersion, bool includeName)
 {
-    QString ver{includeName ? "SA:MP " : ""};
+    QString ver{includeName ? "SA-MP " : ""};
 
     switch (sampVersion) {
         case SampVersion::SAMP_03E:

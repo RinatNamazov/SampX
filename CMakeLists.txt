@@ -22,7 +22,7 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt5 COMPONENTS Widgets Network LinguistTools REQUIRED)
 find_package(pe-parse CONFIG REQUIRED)
 
-file(GLOB SAMPX_SRCS
+set(SAMPX_SRCS
     ${CMAKE_SOURCE_DIR}/src/AdaptersDialog.cpp
     ${CMAKE_SOURCE_DIR}/src/GameLauncher.cpp
     ${CMAKE_SOURCE_DIR}/src/main.cpp
@@ -36,7 +36,7 @@ file(GLOB SAMPX_SRCS
     ${CMAKE_SOURCE_DIR}/src/utils.cpp
 )
 
-file(GLOB SAMPX_HDRS
+set(SAMPX_HDRS
     ${CMAKE_SOURCE_DIR}/src/AdaptersDialog.hpp
     ${CMAKE_SOURCE_DIR}/src/GameLauncher.hpp
     ${CMAKE_SOURCE_DIR}/src/MainWindow.hpp
@@ -49,20 +49,20 @@ file(GLOB SAMPX_HDRS
     ${CMAKE_SOURCE_DIR}/src/utils.hpp
 )
 
-file(GLOB SAMPX_UI
+set(SAMPX_UI
     ${CMAKE_SOURCE_DIR}/src/AdaptersDialog.ui
     ${CMAKE_SOURCE_DIR}/src/MainWindow.ui
     ${CMAKE_SOURCE_DIR}/src/ProxysDialog.ui
     ${CMAKE_SOURCE_DIR}/src/SampVersionsDialog.ui
 )
 
-file(GLOB SAMPX_TS
+set(SAMPX_TS
     ${CMAKE_SOURCE_DIR}/translations/en_US.ts
     ${CMAKE_SOURCE_DIR}/translations/ru_RU.ts
 )
 
 if (UPDATE_TRANSLATION_SOURCES)
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR} ${SAMPX_TS})
+    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/src ${SAMPX_TS})
 else()
     qt5_add_translation(QM_FILES ${SAMPX_TS})
 endif()
