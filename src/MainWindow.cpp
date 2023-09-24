@@ -4,7 +4,7 @@
  *  LICENSE:        See LICENSE in the top level directory
  *  FILE:           MainWindow.cpp
  *  DESCRIPTION:    Main window
- *  COPYRIGHT:      (c) 2021 RINWARES <rinwares.com>
+ *  COPYRIGHT:      (c) 2021, 2023 RINWARES <rinwares.com>
  *  AUTHOR:         Rinat Namazov <rinat.namazov@rinwares.com>
  *
  *****************************************************************************/
@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget* parent)
     QCoreApplication::setOrganizationName("RINWARES");
     QCoreApplication::setOrganizationDomain("rinwares.com");
     QCoreApplication::setApplicationName("SampX");
-    QCoreApplication::setApplicationVersion("v.1.0.1-alpha");
+    QCoreApplication::setApplicationVersion("v.1.0.2-alpha");
 
     ui_->setupUi(this);
 

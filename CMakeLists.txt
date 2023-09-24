@@ -3,8 +3,8 @@
 # *  PROJECT:           SampX
 # *  LICENSE:           See LICENSE in the top level directory
 # *  FILE:              CMakeLists.txt
-# *  DESCRIPTION:       CMake
-# *  COPYRIGHT:         (c) 2021 RINWARES <rinwares.com>
+# *  DESCRIPTION:       CMakeLists
+# *  COPYRIGHT:         (c) 2021, 2023 RINWARES <rinwares.com>
 # *  AUTHOR:            Rinat Namazov <rinat.namazov@rinwares.com>
 # *
 # *****************************************************************************

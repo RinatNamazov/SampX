@@ -4,7 +4,7 @@
  *  LICENSE:        See LICENSE in the top level directory
  *  FILE:           SampVersions.cpp
  *  DESCRIPTION:    Determining the version of the samp by file
- *  COPYRIGHT:      (c) 2021 RINWARES <rinwares.com>
+ *  COPYRIGHT:      (c) 2021, 2023 RINWARES <rinwares.com>
  *  AUTHOR:         Rinat Namazov <rinat.namazov@rinwares.com>
  *
  *****************************************************************************/
