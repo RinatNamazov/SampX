@@ -4,7 +4,7 @@
  *  LICENSE:        See LICENSE in the top level directory
  *  FILE:           SettingsData.cpp
  *  DESCRIPTION:    Read/write config file 
- *  COPYRIGHT:      (c) 2021 RINWARES <rinwares.com>
+ *  COPYRIGHT:      (c) 2021, 2023 RINWARES <rinwares.com>
  *  AUTHOR:         Rinat Namazov <rinat.namazov@rinwares.com>
  *
  *****************************************************************************/
@@ -272,7 +272,7 @@ void SettingsData::setProxy(quint32 id, const QPair<QString, QString>& proxy)
 quint32 SettingsData::addProxy(const QPair<QString, QString>& proxy)
 {
     proxys_.append(proxy);
-    return proxys_.lastIndexOf(proxy);
+    return proxys_.size() - 1;
 }
 
 void SettingsData::deleteProxy(quint32 id)
@@ -303,7 +303,7 @@ void SettingsData::setAdapter(quint32 id, const QString& adapter)
 quint32 SettingsData::addAdapter(const QString& adapter)
 {
     adapters_.append(adapter);
-    return adapters_.lastIndexOf(adapter);
+    return adapters_.size() - 1;
 }
 
 void SettingsData::deleteAdapter(quint32 id)
@@ -338,7 +338,7 @@ quint32 SettingsData::addGameDir(const QString& gameDir)
         return idx;
     }
     gameDirs_.append(gameDir);
-    return gameDirs_.indexOf(gameDir);
+    return gameDirs_.size() - 1;
 }
 
 void SettingsData::deleteGameDir(quint32 id)
@@ -397,7 +397,7 @@ quint32 SettingsData::addGameExecutable(const QString& gameExe)
         return idx;
     }
     gameExecutables_.append(gameExe);
-    return gameExecutables_.indexOf(gameExe);
+    return gameExecutables_.size() - 1;
 }
 
 void SettingsData::deleteGameExecutable(quint32 id)
@@ -452,7 +452,7 @@ void SettingsData::setSampVersion(quint32 id, const QPair<QString, QString>& sam
 quint32 SettingsData::addSampVersion(const QPair<QString, QString>& samp)
 {
     sampVersions_.append(samp);
-    return sampVersions_.indexOf(samp);
+    return sampVersions_.size() - 1;
 }
 
 void SettingsData::deleteSampVersion(quint32 id)
@@ -498,7 +498,7 @@ quint32 SettingsData::addGroup(const QString& group)
         return idx;
     }
     groups_.append(group);
-    return groups_.indexOf(group);
+    return groups_.size() - 1;
 }
 
 void SettingsData::deleteGroup(quint32 id)
@@ -572,9 +572,10 @@ void SettingsData::setProfile(quint32 id, Profile profile)
     profiles_[id] = profile;
 }
 
-void SettingsData::addProfile(const SettingsData::Profile profile)
+quint32 SettingsData::addProfile(const SettingsData::Profile profile)
 {
     profiles_.append(profile);
+    return profiles_.count() - 1;
 }
 
 void SettingsData::deleteProfile(quint32 id)

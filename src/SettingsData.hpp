@@ -4,7 +4,7 @@
  *  LICENSE:        See LICENSE in the top level directory
  *  FILE:           SettingsData.hpp
  *  DESCRIPTION:    Read/write config file
- *  COPYRIGHT:      (c) 2021 RINWARES <rinwares.com>
+ *  COPYRIGHT:      (c) 2021, 2023 RINWARES <rinwares.com>
  *  AUTHOR:         Rinat Namazov <rinat.namazov@rinwares.com>
  *
  *****************************************************************************/
@@ -83,7 +83,7 @@ public:
     quint32 addGameDir(const QString& gameDir);
     void    deleteGameDir(quint32 id);
     int     findGameDir(const QString& gameDir) const;
-    void maybeCleanUpGameDir(quint32 id);
+    void    maybeCleanUpGameDir(quint32 id);
 
     quint32 getGameExecutableCount() const;
     QString getGameExecutable(quint32 id) const;
@@ -116,7 +116,7 @@ public:
     quint32 getProfileCount() const;
     Profile getProfile(quint32 id) const;
     void    setProfile(quint32 id, Profile profile);
-    void    addProfile(Profile profile);
+    quint32 addProfile(Profile profile);
     void    deleteProfile(quint32 id);
 
 private:
