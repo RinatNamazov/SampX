@@ -907,11 +907,15 @@ void MainWindow::on_profile_currentIndexChanged(int index)
     ui_->sampVersion->setCurrentIndex(profile.samp);
     ui_->comment->setPlainText(profile.comment);
 
-    int curServerIndex{ui_->servers->currentRow()};
-    if (curServerIndex != -1 && ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
-        auto srv{config_.getServer(curServerIndex)};
-        srv.profile = index;
-        config_.setServer(curServerIndex, srv);
+    int currentRow{ui_->servers->currentRow()};
+    if (currentRow != -1 && ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
+        quint32 serverId{ui_->servers->item(currentRow, 0)->data(Qt::UserRole).value<quint32>()};
+
+        auto srv{config_.getServer(serverId)};
+        if (srv.profile != index) {
+            srv.profile = index;
+            config_.setServer(serverId, srv);
+        }
     }
 }
 
