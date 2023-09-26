@@ -801,6 +801,17 @@ void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
 
 void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
 {
+    // If clicked on an empty space.
+    if (!ui_->servers->indexAt(pos).isValid()) {
+        QMenu    menu(this);
+        auto     addServerAction = menu.addAction(tr("Add server"));
+        QAction* action{menu.exec(ui_->servers->viewport()->mapToGlobal(pos))};
+        if (action == addServerAction) {
+            on_addServerButton_clicked();
+        }
+        return;
+    }
+
     int curServerIndex{getCurrentRow()};
     if (curServerIndex == -1) {
         return;
