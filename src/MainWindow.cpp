@@ -193,6 +193,12 @@ void MainWindow::on_customContextMenuRequested(const QPoint& pos)
     if (deleteAction != nullptr && action == deleteAction) { // Delete
         config_.deleteServer(curServerId);
 
+        for (int i = curServerIndex; i < ui_->servers->rowCount(); ++i) {
+            auto    hostnameItem{ui_->servers->item(i, 0)};
+            quint32 serverId{hostnameItem->data(Qt::UserRole).value<quint32>()};
+            hostnameItem->setData(Qt::UserRole, QVariant::fromValue(serverId - 1));
+        }
+
         int curGroupIndex{ui_->group->currentIndex()};
         if (curGroupIndex == INDEX_INTERNET_GROUP) {
             return;
