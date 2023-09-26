@@ -12,6 +12,8 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 #include <QString>
 #include <QTranslator>
 
@@ -49,8 +51,6 @@ private slots:
 
     void languageChanged(QAction* action);
 
-    void on_customContextMenuRequested(const QPoint& pos);
-
     void on_actionCheckForUpdates_triggered();
     void on_actionSite_triggered();
     void on_actionAbout_triggered();
@@ -74,11 +74,9 @@ private slots:
     void on_deleteGroupButton_clicked();
     void on_addServerButton_clicked();
 
-    void on_servers_cellDoubleClicked(int row, int column);
-    void on_servers_currentCellChanged(int currentRow,
-                                       int currentColumn,
-                                       int previousRow,
-                                       int previousColumn);
+    void on_servers_doubleClicked(const QModelIndex& index);
+    void on_servers_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
+    void on_servers_customContextMenuRequested(const QPoint& pos);
 
     void on_profile_currentIndexChanged(int index);
 
@@ -96,19 +94,23 @@ private slots:
     void on_deleteProfileButton_clicked();
 
 private:
-    Ui::MainWindow*     ui_;
-    SampVersionsDialog* sampVersionsDialog_;
-    AdaptersDialog*     adaptersDialog_;
-    ProxysDialog*       proxysDialog_;
-    QSettings*          settings_;
-    QTranslator         translator_;
-    QTranslator         translatorQt_;
-    QString             currLang_;
-    QString             langPath_;
-    GameLauncher        gameLauncher_;
-    SampQuery           sampQuery_;
-    SettingsData        config_;
-    QTimer*             pingTimer_;
+    Ui::MainWindow*        ui_;
+    QStandardItemModel*    serversModel_;
+    QSortFilterProxyModel* serversProxyModel_;
+    SampVersionsDialog*    sampVersionsDialog_;
+    AdaptersDialog*        adaptersDialog_;
+    ProxysDialog*          proxysDialog_;
+    QSettings*             settings_;
+    QTranslator            translator_;
+    QTranslator            translatorQt_;
+    QString                currLang_;
+    QString                langPath_;
+    GameLauncher           gameLauncher_;
+    SampQuery              sampQuery_;
+    SettingsData           config_;
+    QTimer*                pingTimer_;
+
+    int getCurrentRow();
 
     void loadLastTheme();
     void setLastWindowsSizeAndPos();

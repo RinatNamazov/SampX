@@ -100,7 +100,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QTableWidget" name="servers">
+           <widget class="QTableView" name="servers">
             <property name="editTriggers">
              <set>QAbstractItemView::NoEditTriggers</set>
             </property>
@@ -122,36 +122,6 @@
             <attribute name="verticalHeaderDefaultSectionSize">
              <number>24</number>
             </attribute>
-            <column>
-             <property name="text">
-              <string>HostName</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Players</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Ping</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Mode</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Language</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Address</string>
-             </property>
-            </column>
            </widget>
           </item>
          </layout>

@@ -64,9 +64,41 @@ MainWindow::MainWindow(QWidget* parent)
     QCoreApplication::setApplicationName("SampX");
     QCoreApplication::setApplicationVersion("v.1.0.2-alpha");
 
+    settings_ = new QSettings();
+
     ui_->setupUi(this);
 
-    settings_ = new QSettings();
+    sampVersionsDialog_ = new SampVersionsDialog(&config_, ui_->sampVersion, this);
+    adaptersDialog_     = new AdaptersDialog(&config_, ui_->adapter, this);
+    proxysDialog_       = new ProxysDialog(&config_, ui_->proxy, this);
+
+    serversModel_      = new QStandardItemModel(this);
+    serversProxyModel_ = new QSortFilterProxyModel(this);
+
+    serversProxyModel_->setSourceModel(serversModel_);
+    serversProxyModel_->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    serversProxyModel_->setFilterKeyColumn(-1);
+
+    ui_->servers->setModel(serversProxyModel_);
+    ui_->servers->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    auto headerModel{new QStandardItemModel(1, 6)};
+
+    headerModel->setHeaderData(0, Qt::Horizontal, tr("HostName"), Qt::DisplayRole);
+    headerModel->setHeaderData(1, Qt::Horizontal, tr("Players"), Qt::DisplayRole);
+    headerModel->setHeaderData(2, Qt::Horizontal, tr("Ping"), Qt::DisplayRole);
+    headerModel->setHeaderData(3, Qt::Horizontal, tr("Mode"), Qt::DisplayRole);
+    headerModel->setHeaderData(4, Qt::Horizontal, tr("Language"), Qt::DisplayRole);
+    headerModel->setHeaderData(5, Qt::Horizontal, tr("Address"), Qt::DisplayRole);
+
+    ui_->servers->setHorizontalHeader(new QHeaderView(Qt::Horizontal));
+    ui_->servers->horizontalHeader()->setModel(headerModel);
+
+    auto selectionModel = ui_->servers->selectionModel();
+    QObject::connect(selectionModel,
+                     &QItemSelectionModel::currentRowChanged,
+                     this,
+                     &MainWindow::on_servers_currentRowChanged);
 
     setLastWindowsSizeAndPos();
     loadLastTheme();
@@ -78,15 +110,6 @@ MainWindow::MainWindow(QWidget* parent)
     if (!config_.load("./sampx.dat")) {
         createDefaultConfig();
     }
-
-    QObject::connect(&sampQuery_,
-                     &SampQuery::masterServerResponded,
-                     this,
-                     &MainWindow::masterServerResponded);
-
-    pingTimer_ = new QTimer(this);
-    QObject::connect(pingTimer_, &QTimer::timeout, this, &MainWindow::updateServerInfo);
-    pingTimer_->start(1000);
 
     ui_->group->addItem("Internet");
     for (quint32 i{0}; i < config_.getGroupCount(); ++i) {
@@ -103,10 +126,6 @@ MainWindow::MainWindow(QWidget* parent)
     for (quint32 i{0}; i < config_.getAdapterCount(); ++i) {
         ui_->adapter->addItem(config_.getAdapter(i));
     }
-
-    sampVersionsDialog_ = new SampVersionsDialog(&config_, ui_->sampVersion, this);
-    adaptersDialog_     = new AdaptersDialog(&config_, ui_->adapter, this);
-    proxysDialog_       = new ProxysDialog(&config_, ui_->proxy, this);
 
     for (quint32 i{0}; i < config_.getProfileCount(); ++i) {
         auto profile{config_.getProfile(i)};
@@ -125,12 +144,6 @@ MainWindow::MainWindow(QWidget* parent)
     }
     ui_->profile->setCurrentIndex(currentProfile);
 
-    ui_->servers->setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(ui_->servers,
-                     &QTableWidget::customContextMenuRequested,
-                     this,
-                     &MainWindow::on_customContextMenuRequested);
-
     int  currentGroupIndex{0};
     auto lastGroup{settings_->value("group")};
     if (lastGroup.isNull()) {
@@ -142,114 +155,15 @@ MainWindow::MainWindow(QWidget* parent)
         currentGroupIndex = 0;
     }
     ui_->group->setCurrentIndex(currentGroupIndex);
-}
 
-void MainWindow::on_customContextMenuRequested(const QPoint& pos)
-{
-    int curServerIndex{ui_->servers->currentRow()};
-    if (curServerIndex == -1) {
-        return;
-    }
+    QObject::connect(&sampQuery_,
+                     &SampQuery::masterServerResponded,
+                     this,
+                     &MainWindow::masterServerResponded);
 
-    QMenu    menu(this);
-    QAction* deleteAction{nullptr};
-    QAction* editPasswordAction{nullptr};
-
-    int     curGroupIndex{ui_->group->currentIndex()};
-    quint32 curGroupId{getGroupOrProxyOrAdapterByIndex(curGroupIndex)};
-
-    quint32 curServerId{ui_->servers->item(curServerIndex, 0)->data(Qt::UserRole).value<quint32>()};
-    auto    curServer{config_.getServer(curServerId)};
-    QString curServerAddress{ui_->servers->item(curServerIndex, 5)->text()};
-
-    QVector<quint32> groups;
-
-    for (quint32 groupId{0}; groupId < config_.getGroupCount(); ++groupId) {
-        // Check that there is no current server in the other groups.
-        if (groupId != curGroupId && config_.findServerByAddress(curServerAddress, groupId) == -1) {
-            groups.append(groupId);
-        }
-    }
-
-    if (!groups.isEmpty()) {
-        QMenu* addToMenu{menu.addMenu(tr("Add to"))};
-
-        for (quint32 groupId : groups) {
-            QAction* act{addToMenu->addAction(config_.getGroup(groupId))};
-            act->setData(groupId);
-        }
-    }
-
-    if (curGroupIndex != INDEX_INTERNET_GROUP) {
-        deleteAction       = menu.addAction(tr("Delete"));
-        editPasswordAction = menu.addAction(tr("Edit password"));
-    }
-
-    QAction* action{menu.exec(ui_->servers->viewport()->mapToGlobal(pos))};
-    if (action == nullptr) {
-        return;
-    }
-
-    if (deleteAction != nullptr && action == deleteAction) { // Delete
-        config_.deleteServer(curServerId);
-
-        for (int i = curServerIndex; i < ui_->servers->rowCount(); ++i) {
-            auto    hostnameItem{ui_->servers->item(i, 0)};
-            quint32 serverId{hostnameItem->data(Qt::UserRole).value<quint32>()};
-            hostnameItem->setData(Qt::UserRole, QVariant::fromValue(serverId - 1));
-        }
-
-        int curGroupIndex{ui_->group->currentIndex()};
-        if (curGroupIndex == INDEX_INTERNET_GROUP) {
-            return;
-        }
-        int curServerIndex{ui_->servers->currentRow()};
-        if (curServerIndex == -1) {
-            return;
-        }
-
-        QTableWidgetItem* addressRow{ui_->servers->item(curServerIndex, 5)};
-        QVariant          userData{addressRow->data(Qt::UserRole)};
-        if (!userData.isNull()) {
-            auto sq{userData.value<SampQuery*>()};
-            if (sq != nullptr) {
-                delete sq;
-            }
-        }
-
-        ui_->servers->removeRow(curServerIndex);
-    } else if (editPasswordAction != nullptr && action == editPasswordAction) { // Edit password
-        auto srv{config_.getServer(curServerId)};
-
-        bool    ok;
-        QString pass = QInputDialog::getText(this,
-                                             tr("Add server"),
-                                             tr("Enter server password"),
-                                             QLineEdit::Normal,
-                                             srv.password,
-                                             &ok);
-        if (!ok) {
-            return;
-        }
-
-        srv.password = pass;
-        config_.setServer(curServerId, srv);
-    } else {
-        // Add to
-        int groupId{action->data().toInt()};
-
-        SettingsData::Server srv;
-
-        srv.profile = ui_->profile->currentIndex();
-        srv.group   = groupId;
-        srv.address = curServerAddress;
-
-        if (deleteAction != nullptr) {
-            srv.password = curServer.password;
-        }
-
-        config_.addServer(srv);
-    }
+    pingTimer_ = new QTimer(this);
+    QObject::connect(pingTimer_, &QTimer::timeout, this, &MainWindow::updateServerInfo);
+    pingTimer_->start(1000);
 }
 
 MainWindow::~MainWindow()
@@ -258,6 +172,8 @@ MainWindow::~MainWindow()
     delete adaptersDialog_;
     delete proxysDialog_;
     delete pingTimer_;
+    delete serversProxyModel_;
+    delete serversModel_;
     delete ui_;
     delete settings_;
 }
@@ -300,12 +216,9 @@ void MainWindow::closeEvent(QCloseEvent*)
 
     QStringList colWidth;
     colWidth.reserve(6);
-    colWidth.append(QString::number(ui_->servers->columnWidth(0))); // HostName
-    colWidth.append(QString::number(ui_->servers->columnWidth(1))); // Players
-    colWidth.append(QString::number(ui_->servers->columnWidth(2))); // Ping
-    colWidth.append(QString::number(ui_->servers->columnWidth(3))); // Mode
-    colWidth.append(QString::number(ui_->servers->columnWidth(4))); // Language
-    colWidth.append(QString::number(ui_->servers->columnWidth(5))); // Address
+    for (int i{0}; i < 6; ++i) {
+        colWidth.append(QString::number(ui_->servers->columnWidth(i)));
+    }
     settings_->setValue("column_width", colWidth);
 
     config_.save();
@@ -314,22 +227,30 @@ void MainWindow::closeEvent(QCloseEvent*)
 void MainWindow::masterServerResponded(const QStringList& servers)
 {
     if (ui_->group->currentIndex() == INDEX_INTERNET_GROUP) {
-        ui_->servers->setRowCount(servers.count());
+        serversModel_->setRowCount(servers.count());
 
         for (int i{0}; i < servers.count(); i++) {
-            QTableWidgetItem* hostnameItem{new QTableWidgetItem(tr("Not Available"))};
+            auto hostnameItem{new QStandardItem(tr("Not Available"))};
             //hostnameItem->setForeground(QBrush{NotRespondingServersColor});
 
-            ui_->servers->setItem(i, 0, hostnameItem);
-            ui_->servers->setItem(i, 1, new QTableWidgetItem());
-            ui_->servers->setItem(i, 2, new QTableWidgetItem());
-            ui_->servers->setItem(i, 3, new QTableWidgetItem());
-            ui_->servers->setItem(i, 4, new QTableWidgetItem());
-            ui_->servers->setItem(i, 5, new QTableWidgetItem(servers[i]));
+            serversModel_->setItem(i, 0, hostnameItem);
+            for (int j{1}; j <= 4; ++j) {
+                serversModel_->setItem(i, j, new QStandardItem());
+            }
+            serversModel_->setItem(i, 5, new QStandardItem(servers[i]));
 
             pingServerInTable(i);
         }
     }
+}
+
+int MainWindow::getCurrentRow()
+{
+    auto rows = ui_->servers->selectionModel()->selectedRows();
+    if (!rows.isEmpty()) {
+        return rows.first().row();
+    }
+    return -1;
 }
 
 void MainWindow::loadLastTheme()
@@ -395,7 +316,7 @@ void MainWindow::setLastServersColumnWidth()
     QVariant lastColumnWidth{settings_->value("column_width")};
     if (!lastColumnWidth.isNull() && lastColumnWidth.userType() == QMetaType::QStringList) {
         QStringList colWidth{lastColumnWidth.toStringList()};
-        if (colWidth.count() <= ui_->servers->columnCount()) {
+        if (colWidth.count() <= serversModel_->columnCount()) {
             for (int i{0}; i < colWidth.count(); ++i) {
                 uint width{colWidth[i].toUInt()};
                 ui_->servers->setColumnWidth(i, width);
@@ -475,7 +396,7 @@ void MainWindow::createDefaultConfig()
     }
 
     if (!config_.save()) {
-        QMessageBox::warning(this, tr("Error"), tr("Failed to save config file."), QMessageBox::Ok);    
+        QMessageBox::warning(this, tr("Error"), tr("Failed to save config file."), QMessageBox::Ok);
     }
 }
 
@@ -661,32 +582,18 @@ void MainWindow::on_actionLight_triggered()
 
 void MainWindow::on_connectButton_clicked()
 {
-    launchGameWithServerOnRow(ui_->servers->currentRow());
+    launchGameWithServerOnRow(getCurrentRow());
 }
 
 void MainWindow::on_search_textChanged(const QString& text)
 {
-    if (text.isEmpty()) {
-        for (int i{0}; i < ui_->servers->rowCount(); ++i) {
-            ui_->servers->showRow(i);
-        }
-        return;
-    }
-
-    for (int i{0}; i < ui_->servers->rowCount(); ++i) {
-        ui_->servers->hideRow(i);
-    }
-
-    auto items{ui_->servers->findItems(text, Qt::MatchContains)};
-    for (const auto& item : items) {
-        ui_->servers->showRow(item->row());
-    }
+    serversProxyModel_->setFilterFixedString(text);
 }
 
 void MainWindow::on_group_currentIndexChanged(int index)
 {
-    for (int i{0}; i < ui_->servers->rowCount(); ++i) {
-        QTableWidgetItem* addressRow{ui_->servers->item(i, 5)};
+    for (int i{0}; i < serversModel_->rowCount(); ++i) {
+        auto addressRow{serversModel_->item(i, 5)};
         if (addressRow != nullptr) {
             QVariant userData{addressRow->data(Qt::UserRole)};
             if (!userData.isNull()) {
@@ -698,7 +605,7 @@ void MainWindow::on_group_currentIndexChanged(int index)
         }
     }
 
-    ui_->servers->setRowCount(0);
+    serversModel_->setRowCount(0);
 
     if (index == INDEX_INTERNET_GROUP) {
         sampQuery_.requestMasterServerList();
@@ -714,18 +621,17 @@ void MainWindow::on_group_currentIndexChanged(int index)
             auto server{config_.getServer(i)};
 
             if (server.group == groupId) {
-                int row{ui_->servers->rowCount()};
-                ui_->servers->insertRow(row);
+                int row{serversModel_->rowCount()};
+                serversModel_->insertRow(row);
 
-                QTableWidgetItem* hostnameItem{new QTableWidgetItem(tr("Not Available"))};
-                hostnameItem->setData(Qt::UserRole, QVariant::fromValue(i)); // Server ID
+                auto hostnameItem{new QStandardItem(tr("Not Available"))};
+                hostnameItem->setData(QVariant::fromValue(i), Qt::UserRole); // Server ID
 
-                ui_->servers->setItem(row, 0, hostnameItem);
-                ui_->servers->setItem(row, 1, new QTableWidgetItem());
-                ui_->servers->setItem(row, 2, new QTableWidgetItem());
-                ui_->servers->setItem(row, 3, new QTableWidgetItem());
-                ui_->servers->setItem(row, 4, new QTableWidgetItem());
-                ui_->servers->setItem(row, 5, new QTableWidgetItem(server.address));
+                serversModel_->setItem(row, 0, hostnameItem);
+                for (int i{1}; i <= 4; ++i) {
+                    serversModel_->setItem(row, i, new QStandardItem());
+                }
+                serversModel_->setItem(row, 5, new QStandardItem(server.address));
 
                 pingServerInTable(row);
             }
@@ -825,33 +731,32 @@ void MainWindow::on_addServerButton_clicked()
     server.profile = ui_->profile->currentIndex();
     quint32 serverId{config_.addServer(server)};
 
-    int i{ui_->servers->rowCount()};
-    ui_->servers->insertRow(ui_->servers->rowCount());
+    int idx{serversModel_->rowCount()};
+    serversModel_->insertRow(serversModel_->rowCount());
 
-    QTableWidgetItem* hostnameRow{new QTableWidgetItem()};
-    hostnameRow->setData(Qt::UserRole, QVariant::fromValue(serverId));
-    ui_->servers->setItem(i, 0, hostnameRow);
+    auto hostnameItem{new QStandardItem()};
+    hostnameItem->setData(QVariant::fromValue(serverId), Qt::UserRole);
+    serversModel_->setItem(idx, 0, hostnameItem);
+    for (int i{1}; i <= 4; ++i) {
+        serversModel_->setItem(idx, i, new QStandardItem());
+    }
+    serversModel_->setItem(idx, 5, new QStandardItem(server.address));
 
-    ui_->servers->setItem(i, 1, new QTableWidgetItem());
-    ui_->servers->setItem(i, 2, new QTableWidgetItem());
-    ui_->servers->setItem(i, 3, new QTableWidgetItem());
-    ui_->servers->setItem(i, 4, new QTableWidgetItem());
-    ui_->servers->setItem(i, 5, new QTableWidgetItem(server.address));
-
-    ui_->servers->setCurrentCell(i, 0);
+    QModelIndex index = serversModel_->index(idx, 0);
+    ui_->servers->setCurrentIndex(index);
 }
 
-void MainWindow::on_servers_cellDoubleClicked(int row, int column)
+void MainWindow::on_servers_doubleClicked(const QModelIndex& index)
 {
-    if (row == -1) {
+    if (index.row() == -1) {
         return;
     }
 
     QString address, password;
     if (ui_->group->currentIndex() == INDEX_INTERNET_GROUP) {
-        address = ui_->servers->item(row, 5)->text();
+        address = serversModel_->item(index.row(), 5)->text();
     } else {
-        quint32 serverId{ui_->servers->item(row, 0)->data(Qt::UserRole).value<quint32>()};
+        quint32 serverId{serversModel_->item(index.row(), 0)->data(Qt::UserRole).value<quint32>()};
         auto    srv{config_.getServer(serverId)};
         address  = srv.address;
         password = srv.password;
@@ -860,12 +765,10 @@ void MainWindow::on_servers_cellDoubleClicked(int row, int column)
     launchGame(address, password);
 }
 
-void MainWindow::on_servers_currentCellChanged(int currentRow,
-                                               int currentColumn,
-                                               int previousRow,
-                                               int previousColumn)
+void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
+                                              const QModelIndex& previous)
 {
-    if (currentRow == -1) {
+    if (current.row() == -1) {
         return;
     }
 
@@ -879,14 +782,14 @@ void MainWindow::on_servers_currentCellChanged(int currentRow,
     ui_->serverUrl->clear();
     ui_->serverWorldTime->clear();
 
-    pingServerInTable(currentRow, false);
+    pingServerInTable(current.row(), false);
 
-    QString serverAddress{ui_->servers->item(currentRow, 5)->text()};
+    QString serverAddress{serversModel_->item(current.row(), 5)->text()};
 
     ui_->serverInfoBox->setTitle(tr("Server Information: ") + serverAddress);
 
     if (ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
-        quint32 serverId{ui_->servers->item(currentRow, 0)->data(Qt::UserRole).value<quint32>()};
+        quint32 serverId{serversModel_->item(current.row(), 0)->data(Qt::UserRole).value<quint32>()};
 
         auto srv{config_.getServer(serverId)};
 
@@ -894,6 +797,114 @@ void MainWindow::on_servers_currentCellChanged(int currentRow,
     }
 
     ui_->connectButton->setEnabled(true);
+}
+
+void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
+{
+    int curServerIndex{getCurrentRow()};
+    if (curServerIndex == -1) {
+        return;
+    }
+
+    QMenu    menu(this);
+    QAction* deleteAction{nullptr};
+    QAction* editPasswordAction{nullptr};
+
+    int     curGroupIndex{ui_->group->currentIndex()};
+    quint32 curGroupId{getGroupOrProxyOrAdapterByIndex(curGroupIndex)};
+
+    quint32 curServerId{serversModel_->item(curServerIndex, 0)->data(Qt::UserRole).value<quint32>()};
+    auto    curServer{config_.getServer(curServerId)};
+    QString curServerAddress{serversModel_->item(curServerIndex, 5)->text()};
+
+    QVector<quint32> groups;
+
+    for (quint32 groupId{0}; groupId < config_.getGroupCount(); ++groupId) {
+        // Check that there is no current server in the other groups.
+        if (groupId != curGroupId && config_.findServerByAddress(curServerAddress, groupId) == -1) {
+            groups.append(groupId);
+        }
+    }
+
+    if (!groups.isEmpty()) {
+        QMenu* addToMenu{menu.addMenu(tr("Add to"))};
+
+        for (quint32 groupId : groups) {
+            QAction* act{addToMenu->addAction(config_.getGroup(groupId))};
+            act->setData(groupId);
+        }
+    }
+
+    if (curGroupIndex != INDEX_INTERNET_GROUP) {
+        deleteAction       = menu.addAction(tr("Delete"));
+        editPasswordAction = menu.addAction(tr("Edit password"));
+    }
+
+    QAction* action{menu.exec(ui_->servers->viewport()->mapToGlobal(pos))};
+    if (action == nullptr) {
+        return;
+    }
+
+    if (deleteAction != nullptr && action == deleteAction) { // Delete
+        config_.deleteServer(curServerId);
+
+        for (int i{curServerIndex}; i < serversModel_->rowCount(); ++i) {
+            auto    hostnameItem{serversModel_->item(i, 0)};
+            quint32 serverId{hostnameItem->data(Qt::UserRole).value<quint32>()};
+            hostnameItem->setData(QVariant::fromValue(serverId - 1), Qt::UserRole);
+        }
+
+        int curGroupIndex{ui_->group->currentIndex()};
+        if (curGroupIndex == INDEX_INTERNET_GROUP) {
+            return;
+        }
+        int curServerIndex{getCurrentRow()};
+        if (curServerIndex == -1) {
+            return;
+        }
+
+        auto     addressRow{serversModel_->item(curServerIndex, 5)};
+        QVariant userData{addressRow->data(Qt::UserRole)};
+        if (!userData.isNull()) {
+            auto sq{userData.value<SampQuery*>()};
+            if (sq != nullptr) {
+                delete sq;
+            }
+        }
+
+        serversModel_->removeRow(curServerIndex);
+    } else if (editPasswordAction != nullptr && action == editPasswordAction) { // Edit password
+        auto srv{config_.getServer(curServerId)};
+
+        bool    ok;
+        QString pass = QInputDialog::getText(this,
+                                             tr("Add server"),
+                                             tr("Enter server password"),
+                                             QLineEdit::Normal,
+                                             srv.password,
+                                             &ok);
+        if (!ok) {
+            return;
+        }
+
+        srv.password = pass;
+        config_.setServer(curServerId, srv);
+    } else {
+        // Add to
+        int groupId{action->data().toInt()};
+
+        SettingsData::Server srv;
+
+        srv.profile = ui_->profile->currentIndex();
+        srv.group   = groupId;
+        srv.address = curServerAddress;
+
+        if (deleteAction != nullptr) {
+            srv.password = curServer.password;
+        }
+
+        config_.addServer(srv);
+    }
 }
 
 void MainWindow::on_profile_currentIndexChanged(int index)
@@ -915,9 +926,9 @@ void MainWindow::on_profile_currentIndexChanged(int index)
     ui_->sampVersion->setCurrentIndex(profile.samp);
     ui_->comment->setPlainText(profile.comment);
 
-    int currentRow{ui_->servers->currentRow()};
+    int currentRow{getCurrentRow()};
     if (currentRow != -1 && ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
-        quint32 serverId{ui_->servers->item(currentRow, 0)->data(Qt::UserRole).value<quint32>()};
+        quint32 serverId{serversModel_->item(currentRow, 0)->data(Qt::UserRole).value<quint32>()};
 
         auto srv{config_.getServer(serverId)};
         if (srv.profile != index) {
@@ -1107,7 +1118,7 @@ void MainWindow::updateServerInfo()
     // Todo: Add this to the settings.
     /*
     // Ping only selected server.
-    int row{ui_->servers->currentRow()};
+    int row{getCurrentRow()};
     if (row != -1) {
         pingServerInTable(row);
     }
@@ -1115,7 +1126,7 @@ void MainWindow::updateServerInfo()
  */
 
     // Ping all servers.
-    for (int i{0}; i < ui_->servers->rowCount(); ++i) {
+    for (int i{0}; i < serversModel_->rowCount(); ++i) {
         pingServerInTable(i);
     }
 }
@@ -1124,13 +1135,13 @@ void MainWindow::pingServerInTable(int row, bool useHttp)
 {
     // Todo: Create a queue of ping query.
 
-    QString serverAddress{ui_->servers->item(row, 5)->text()};
+    QString serverAddress{serversModel_->item(row, 5)->text()};
 
-    if (ui_->servers->currentRow() == row) {
+    if (getCurrentRow() == row) {
         ui_->serverAddress->setText(serverAddress);
     }
 
-    QTableWidgetItem* addressRow{ui_->servers->item(row, 5)};
+    auto addressRow{serversModel_->item(row, 5)};
 
     auto sq{addressRow->data(Qt::UserRole).value<SampQuery*>()};
     if (sq) {
@@ -1139,24 +1150,24 @@ void MainWindow::pingServerInTable(int row, bool useHttp)
         }
     } else {
         sq = new SampQuery(serverAddress);
-        addressRow->setData(Qt::UserRole, QVariant::fromValue(sq));
+        addressRow->setData(QVariant::fromValue(sq), Qt::UserRole);
 
-        QTableWidgetItem* pingItem{ui_->servers->item(row, 2)};
+        auto pingItem{serversModel_->item(row, 2)};
 
         QObject::connect(sq, &SampQuery::pingCalculated, this, [this, pingItem](int ping) {
             QString pingStr{QString::number(ping)};
 
             pingItem->setText(pingStr);
 
-            if (ui_->servers->item(ui_->servers->currentRow(), 2) == pingItem) {
+            if (serversModel_->item(getCurrentRow(), 2) == pingItem) {
                 ui_->serverPing->setText(pingStr);
             }
         });
 
-        QTableWidgetItem* hostnameItem{ui_->servers->item(row, 0)};
-        QTableWidgetItem* onlineItem{ui_->servers->item(row, 1)};
-        QTableWidgetItem* modeItem{ui_->servers->item(row, 3)};
-        QTableWidgetItem* languageItem{ui_->servers->item(row, 4)};
+        auto hostnameItem{serversModel_->item(row, 0)};
+        auto onlineItem{serversModel_->item(row, 1)};
+        auto modeItem{serversModel_->item(row, 3)};
+        auto languageItem{serversModel_->item(row, 4)};
 
         QObject::connect(sq,
                          &SampQuery::serverInfoResponse,
@@ -1175,7 +1186,7 @@ void MainWindow::pingServerInTable(int row, bool useHttp)
                                  hostnameItem->setForeground(QBrush{ClosedServersColor});
                              }
 
-                             if (ui_->servers->item(ui_->servers->currentRow(), 0) == hostnameItem) {
+                             if (serversModel_->item(getCurrentRow(), 0) == hostnameItem) {
                                  ui_->serverInfoBox->setTitle(tr("Server Information: ")
                                                               + si.hostname);
                                  ui_->serverPlayers->setText(playersText);
@@ -1188,7 +1199,7 @@ void MainWindow::pingServerInTable(int row, bool useHttp)
                          &SampQuery::serverRulesResponse,
                          this,
                          [this, hostnameItem](QMap<QString, QString> rules) {
-                             if (ui_->servers->item(ui_->servers->currentRow(), 0) != hostnameItem) {
+                             if (serversModel_->item(getCurrentRow(), 0) != hostnameItem) {
                                  return;
                              }
 
@@ -1239,9 +1250,9 @@ void MainWindow::launchGameWithServerOnRow(int row)
 
     QString address, password;
     if (ui_->group->currentIndex() == INDEX_INTERNET_GROUP) {
-        address = ui_->servers->item(row, 5)->text();
+        address = serversModel_->item(row, 5)->text();
     } else {
-        quint32 serverId{ui_->servers->item(row, 0)->data(Qt::UserRole).value<quint32>()};
+        quint32 serverId{serversModel_->item(row, 0)->data(Qt::UserRole).value<quint32>()};
         auto    srv{config_.getServer(serverId)};
 
         address  = srv.address;
