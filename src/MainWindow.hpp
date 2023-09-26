@@ -126,7 +126,7 @@ private:
     void loadLanguage(const QString& newLanguage);
 
     void updateServerInfo();
-    void pingServerInTable(int row, bool useHttp = true);
+    void pingServerInTable(int row);
 
     void launchGameWithServerOnRow(int row);
     void launchGame(const QString& address, const QString& password);

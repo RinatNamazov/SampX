@@ -772,17 +772,18 @@ void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
         return;
     }
 
-    ui_->serverPing->clear();
+    ui_->serverAddress->clear();
     ui_->serverPlayers->clear();
+    ui_->serverPing->clear();
     ui_->serverMode->clear();
     ui_->serverLanguage->clear();
     ui_->serverMap->clear();
-    ui_->serverVersion->clear();
     ui_->serverWeather->clear();
-    ui_->serverUrl->clear();
     ui_->serverWorldTime->clear();
+    ui_->serverUrl->clear();
+    ui_->serverVersion->clear();
 
-    pingServerInTable(current.row(), false);
+    pingServerInTable(current.row());
 
     QString serverAddress{serversModel_->item(current.row(), 5)->text()};
 
@@ -900,8 +901,7 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
 
         srv.password = pass;
         config_.setServer(curServerId, srv);
-    } else {
-        // Add to
+    } else { // Add to
         int groupId{action->data().toInt()};
 
         SettingsData::Server srv;
@@ -1142,15 +1142,13 @@ void MainWindow::updateServerInfo()
     }
 }
 
-void MainWindow::pingServerInTable(int row, bool useHttp)
+void MainWindow::pingServerInTable(int row)
 {
     // Todo: Create a queue of ping query.
 
     QString serverAddress{serversModel_->item(row, 5)->text()};
 
-    if (getCurrentRow() == row) {
-        ui_->serverAddress->setText(serverAddress);
-    }
+    ui_->serverAddress->setText(serverAddress);
 
     auto addressRow{serversModel_->item(row, 5)};
 
@@ -1240,10 +1238,6 @@ void MainWindow::pingServerInTable(int row, bool useHttp)
                                  }
                              }
                          });
-    }
-
-    if (useHttp) {
-        //sq->requestHttpPing();
     }
 
     for (int i{0}; i < 5; ++i) {

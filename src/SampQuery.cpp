@@ -4,7 +4,7 @@
  *  LICENSE:        See LICENSE in the top level directory
  *  FILE:           SampQuery.cpp
  *  DESCRIPTION:    Samp query mechanism
- *  COPYRIGHT:      (c) 2021 RINWARES <rinwares.com>
+ *  COPYRIGHT:      (c) 2021, 2023 RINWARES <rinwares.com>
  *  AUTHOR:         Rinat Namazov <rinat.namazov@rinwares.com>
  *
  *****************************************************************************/
@@ -85,12 +85,6 @@ void SampQuery::requestMasterServerList()
     networkManager_->get(req);
 }
 
-void SampQuery::requestHttpPing()
-{
-    QNetworkRequest req(QUrl("http://" + ip_));
-    networkManager_->get(req);
-}
-
 void SampQuery::requestInformation()
 {
     send(assemblePacket(QueryPaketOpcode::Info));
@@ -115,7 +109,7 @@ void SampQuery::requestPing()
 {
     QByteArray data{assemblePacket(QueryPaketOpcode::Ping)};
 
-    quint32 tickCount{GetTickCount()};
+    quint32    tickCount{GetTickCount()};
     QByteArray tickCountData(sizeof(quint32), Qt::Uninitialized);
     *reinterpret_cast<quint32*>(tickCountData.data()) = tickCount;
 
@@ -126,17 +120,21 @@ void SampQuery::requestPing()
 
 void SampQuery::handleHttpResponse(QNetworkReply* reply)
 {
-    if (reply->error()) {
+    if (reply == nullptr) {
         return;
     }
 
-    if (reply->request().url() == masterServerUrl_) {
-        QString answer{reply->readAll()};
-        auto servers{answer.split("\n")};
-        servers.pop_back(); // Deleting the last transition to a new line.
+    if (!reply->error()) {
+        if (reply->request().url() == masterServerUrl_) {
+            QString answer{reply->readAll()};
+            auto    servers{answer.split("\n")};
+            servers.pop_back(); // Deleting the last transition to a new line.
 
-        emit masterServerResponded(servers);
+            emit masterServerResponded(servers);
+        }
     }
+
+    reply->deleteLater();
 }
 
 void SampQuery::readPendingDatagrams()

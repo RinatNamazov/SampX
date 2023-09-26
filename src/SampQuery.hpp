@@ -4,7 +4,7 @@
  *  LICENSE:        See LICENSE in the top level directory
  *  FILE:           Samp query.cpp
  *  DESCRIPTION:    Samp query mechanism
- *  COPYRIGHT:      (c) 2021 RINWARES <rinwares.com>
+ *  COPYRIGHT:      (c) 2021, 2023 RINWARES <rinwares.com>
  *  AUTHOR:         Rinat Namazov <rinat.namazov@rinwares.com>
  *
  *****************************************************************************/
@@ -66,7 +66,6 @@ public:
     void    setMasterServerAddress(const QString& address);
 
     void requestMasterServerList();
-    void requestHttpPing();
 
     void requestInformation();
     void requestRules();
