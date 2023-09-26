@@ -474,7 +474,9 @@ void MainWindow::createDefaultConfig()
         }
     }
 
-    config_.save();
+    if (!config_.save()) {
+        QMessageBox::warning(this, tr("Error"), tr("Failed to save config file."), QMessageBox::Ok);    
+    }
 }
 
 void MainWindow::loadTheme(const QString& theme)
