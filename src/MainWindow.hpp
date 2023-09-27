@@ -31,6 +31,14 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+class CustomSortFilterProxyModel : public QSortFilterProxyModel {
+public:
+    CustomSortFilterProxyModel(QObject* parent = nullptr);
+
+protected:
+    bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
+};
+
 class SampVersionsDialog;
 class AdaptersDialog;
 class ProxysDialog;
@@ -75,6 +83,7 @@ private slots:
     void on_addServerButton_clicked();
 
     void on_servers_doubleClicked(const QModelIndex& index);
+    void on_servers_sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
     void on_servers_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
     void on_servers_customContextMenuRequested(const QPoint& pos);
 
@@ -94,21 +103,21 @@ private slots:
     void on_deleteProfileButton_clicked();
 
 private:
-    Ui::MainWindow*        ui_;
-    QStandardItemModel*    serversModel_;
-    QSortFilterProxyModel* serversProxyModel_;
-    SampVersionsDialog*    sampVersionsDialog_;
-    AdaptersDialog*        adaptersDialog_;
-    ProxysDialog*          proxysDialog_;
-    QSettings*             settings_;
-    QTranslator            translator_;
-    QTranslator            translatorQt_;
-    QString                currLang_;
-    QString                langPath_;
-    GameLauncher           gameLauncher_;
-    SampQuery              sampQuery_;
-    SettingsData           config_;
-    QTimer*                pingTimer_;
+    Ui::MainWindow*             ui_;
+    QStandardItemModel*         serversModel_;
+    CustomSortFilterProxyModel* serversProxyModel_;
+    SampVersionsDialog*         sampVersionsDialog_;
+    AdaptersDialog*             adaptersDialog_;
+    ProxysDialog*               proxysDialog_;
+    QSettings*                  settings_;
+    QTranslator                 translator_;
+    QTranslator                 translatorQt_;
+    QString                     currLang_;
+    QString                     langPath_;
+    GameLauncher                gameLauncher_;
+    SampQuery                   sampQuery_;
+    SettingsData                config_;
+    QTimer*                     pingTimer_;
 
     int getCurrentRow();
 

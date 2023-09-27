@@ -38,6 +38,39 @@
 #include "ui_MainWindow.h"
 #include "utils.hpp"
 
+CustomSortFilterProxyModel::CustomSortFilterProxyModel(QObject* parent)
+    : QSortFilterProxyModel(parent)
+{}
+
+bool CustomSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
+{
+    // Not available servers are always below. The only exception is for the addresses column.
+    if (left.column() != 5 && right.column() != 5) {
+        bool leftOnline  = sourceModel()->data(left.siblingAtColumn(1)).toString().isEmpty();
+        bool rightOnline = sourceModel()->data(right.siblingAtColumn(1)).toString().isEmpty();
+        if (leftOnline && rightOnline) {
+            return false;
+        } else if (leftOnline && !rightOnline) {
+            return sortOrder() != Qt::AscendingOrder;
+        } else if (!leftOnline && rightOnline) {
+            return sortOrder() != Qt::DescendingOrder;
+        }
+
+        // Online.
+        if (left.column() == 1 && right.column() == 1) {
+            QString leftString  = sourceModel()->data(left).toString();
+            QString rightString = sourceModel()->data(right).toString();
+
+            int leftValue  = leftString.split('/').first().trimmed().toInt();
+            int rightValue = rightString.split('/').first().trimmed().toInt();
+
+            return leftValue < rightValue;
+        }
+    }
+
+    return QSortFilterProxyModel::lessThan(left, right);
+}
+
 const QColor NotRespondingServersColor(128, 128, 128);
 const QColor ClosedServersColor(168, 29, 62);
 
@@ -73,7 +106,7 @@ MainWindow::MainWindow(QWidget* parent)
     proxysDialog_       = new ProxysDialog(&config_, ui_->proxy, this);
 
     serversModel_      = new QStandardItemModel(this);
-    serversProxyModel_ = new QSortFilterProxyModel(this);
+    serversProxyModel_ = new CustomSortFilterProxyModel(this);
 
     serversProxyModel_->setSourceModel(serversModel_);
     serversProxyModel_->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -91,8 +124,18 @@ MainWindow::MainWindow(QWidget* parent)
     headerModel->setHeaderData(4, Qt::Horizontal, tr("Language"), Qt::DisplayRole);
     headerModel->setHeaderData(5, Qt::Horizontal, tr("Address"), Qt::DisplayRole);
 
-    ui_->servers->setHorizontalHeader(new QHeaderView(Qt::Horizontal));
-    ui_->servers->horizontalHeader()->setModel(headerModel);
+    auto header{new QHeaderView(Qt::Horizontal)};
+    ui_->servers->setHorizontalHeader(header);
+    ui_->servers->setSortingEnabled(true);
+    header->setModel(headerModel);
+    header->setSectionsClickable(true);
+
+    // Show the indicator only after at least one click to sort.
+    header->setSortIndicatorShown(false);
+    QObject::connect(header,
+                     &QHeaderView::sortIndicatorChanged,
+                     this,
+                     &MainWindow::on_servers_sortIndicatorChanged);
 
     auto selectionModel = ui_->servers->selectionModel();
     QObject::connect(selectionModel,
@@ -763,6 +806,16 @@ void MainWindow::on_servers_doubleClicked(const QModelIndex& index)
     }
 
     launchGame(address, password);
+}
+
+void MainWindow::on_servers_sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
+{
+    auto header{ui_->servers->horizontalHeader()};
+    header->setSortIndicatorShown(true);
+    QObject::disconnect(header,
+                        &QHeaderView::sortIndicatorChanged,
+                        this,
+                        &MainWindow::on_servers_sortIndicatorChanged);
 }
 
 void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
