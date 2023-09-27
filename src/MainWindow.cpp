@@ -1097,6 +1097,7 @@ void MainWindow::on_selectGameDirButton_clicked()
                                                       QDir::currentPath())};
     if (!dirPath.isEmpty()) {
         ui_->gameDir->setText(dirPath);
+        on_gameDir_editingFinished();
     }
 }
 
