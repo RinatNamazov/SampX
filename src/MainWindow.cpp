@@ -772,7 +772,6 @@ void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
         return;
     }
 
-    ui_->serverAddress->clear();
     ui_->serverPlayers->clear();
     ui_->serverPing->clear();
     ui_->serverMode->clear();
@@ -783,11 +782,9 @@ void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
     ui_->serverUrl->clear();
     ui_->serverVersion->clear();
 
-    pingServerInTable(current.row());
-
     QString serverAddress{serversModel_->item(current.row(), 5)->text()};
-
     ui_->serverInfoBox->setTitle(tr("Server Information: ") + serverAddress);
+    ui_->serverAddress->setText(serverAddress);
 
     if (ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
         quint32 serverId{serversModel_->item(current.row(), 0)->data(Qt::UserRole).value<quint32>()};
@@ -798,6 +795,8 @@ void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
     }
 
     ui_->connectButton->setEnabled(true);
+
+    pingServerInTable(current.row());
 }
 
 void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
@@ -1146,11 +1145,8 @@ void MainWindow::pingServerInTable(int row)
 {
     // Todo: Create a queue of ping query.
 
-    QString serverAddress{serversModel_->item(row, 5)->text()};
-
-    ui_->serverAddress->setText(serverAddress);
-
-    auto addressRow{serversModel_->item(row, 5)};
+    auto    addressRow{serversModel_->item(row, 5)};
+    QString serverAddress{addressRow->text()};
 
     auto sq{addressRow->data(Qt::UserRole).value<SampQuery*>()};
     if (sq) {
