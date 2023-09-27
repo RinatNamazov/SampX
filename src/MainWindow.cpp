@@ -91,6 +91,7 @@ quint32 getGroupOrProxyOrAdapterByIndex(int index)
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui_(new Ui::MainWindow)
+    , isManualProfileChanging_(false)
 {
     QCoreApplication::setOrganizationName("RINWARES");
     QCoreApplication::setOrganizationDomain("rinwares.com");
@@ -294,6 +295,13 @@ int MainWindow::getCurrentRow()
         return rows.first().row();
     }
     return -1;
+}
+
+QStandardItem* MainWindow::getItemFromTable(int row, int column)
+{
+    QModelIndex proxyIndex  = serversProxyModel_->index(row, column);
+    QModelIndex sourceIndex = serversProxyModel_->mapToSource(proxyIndex);
+    return serversModel_->itemFromIndex(sourceIndex);
 }
 
 void MainWindow::loadLastTheme()
@@ -785,8 +793,11 @@ void MainWindow::on_addServerButton_clicked()
     }
     serversModel_->setItem(idx, 5, new QStandardItem(server.address));
 
-    QModelIndex index = serversModel_->index(idx, 0);
-    ui_->servers->setCurrentIndex(index);
+    QModelIndex sourceIndex = serversModel_->index(idx, 0);
+    QModelIndex proxyIndex  = serversProxyModel_->mapFromSource(sourceIndex);
+    if (proxyIndex.isValid()) {
+        ui_->servers->setCurrentIndex(proxyIndex);
+    }
 }
 
 void MainWindow::on_servers_doubleClicked(const QModelIndex& index)
@@ -797,9 +808,9 @@ void MainWindow::on_servers_doubleClicked(const QModelIndex& index)
 
     QString address, password;
     if (ui_->group->currentIndex() == INDEX_INTERNET_GROUP) {
-        address = serversModel_->item(index.row(), 5)->text();
+        address = getItemFromTable(index.row(), 5)->text();
     } else {
-        quint32 serverId{serversModel_->item(index.row(), 0)->data(Qt::UserRole).value<quint32>()};
+        quint32 serverId{getItemFromTable(index.row(), 0)->data(Qt::UserRole).value<quint32>()};
         auto    srv{config_.getServer(serverId)};
         address  = srv.address;
         password = srv.password;
@@ -835,16 +846,18 @@ void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
     ui_->serverUrl->clear();
     ui_->serverVersion->clear();
 
-    QString serverAddress{serversModel_->item(current.row(), 5)->text()};
+    QString serverAddress{getItemFromTable(current.row(), 5)->text()};
     ui_->serverInfoBox->setTitle(tr("Server Information: ") + serverAddress);
     ui_->serverAddress->setText(serverAddress);
 
     if (ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
-        quint32 serverId{serversModel_->item(current.row(), 0)->data(Qt::UserRole).value<quint32>()};
+        quint32 serverId{getItemFromTable(current.row(), 0)->data(Qt::UserRole).value<quint32>()};
 
         auto srv{config_.getServer(serverId)};
 
+        isManualProfileChanging_ = true;
         ui_->profile->setCurrentIndex(srv.profile);
+        isManualProfileChanging_ = false;
     }
 
     ui_->connectButton->setEnabled(true);
@@ -855,9 +868,10 @@ void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
 void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
 {
     // If clicked on an empty space.
-    if (!ui_->servers->indexAt(pos).isValid()) {
+    auto itemIndex{ui_->servers->indexAt(pos)};
+    if (!itemIndex.isValid()) {
         QMenu    menu(this);
-        auto     addServerAction = menu.addAction(tr("Add server"));
+        auto     addServerAction{menu.addAction(tr("Add server"))};
         QAction* action{menu.exec(ui_->servers->viewport()->mapToGlobal(pos))};
         if (action == addServerAction) {
             on_addServerButton_clicked();
@@ -865,10 +879,7 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
         return;
     }
 
-    int curServerIndex{getCurrentRow()};
-    if (curServerIndex == -1) {
-        return;
-    }
+    int curServerIndex{itemIndex.row()};
 
     QMenu    menu(this);
     QAction* deleteAction{nullptr};
@@ -877,9 +888,10 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
     int     curGroupIndex{ui_->group->currentIndex()};
     quint32 curGroupId{getGroupOrProxyOrAdapterByIndex(curGroupIndex)};
 
-    quint32 curServerId{serversModel_->item(curServerIndex, 0)->data(Qt::UserRole).value<quint32>()};
+    quint32 curServerId{getItemFromTable(curServerIndex, 0)->data(Qt::UserRole).value<quint32>()};
     auto    curServer{config_.getServer(curServerId)};
-    QString curServerAddress{serversModel_->item(curServerIndex, 5)->text()};
+    auto    addressRow{getItemFromTable(curServerIndex, 5)};
+    QString curServerAddress{addressRow->text()};
 
     QVector<quint32> groups;
 
@@ -912,7 +924,9 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
     if (deleteAction != nullptr && action == deleteAction) { // Delete
         config_.deleteServer(curServerId);
 
-        for (int i{curServerIndex}; i < serversModel_->rowCount(); ++i) {
+        QModelIndex proxyIndex{serversProxyModel_->index(curServerIndex, 0)};
+        QModelIndex sourceIndex{serversProxyModel_->mapToSource(proxyIndex)};
+        for (int i{sourceIndex.row()}; i < serversModel_->rowCount(); ++i) {
             auto    hostnameItem{serversModel_->item(i, 0)};
             quint32 serverId{hostnameItem->data(Qt::UserRole).value<quint32>()};
             hostnameItem->setData(QVariant::fromValue(serverId - 1), Qt::UserRole);
@@ -922,12 +936,7 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
         if (curGroupIndex == INDEX_INTERNET_GROUP) {
             return;
         }
-        int curServerIndex{getCurrentRow()};
-        if (curServerIndex == -1) {
-            return;
-        }
 
-        auto     addressRow{serversModel_->item(curServerIndex, 5)};
         QVariant userData{addressRow->data(Qt::UserRole)};
         if (!userData.isNull()) {
             auto sq{userData.value<SampQuery*>()};
@@ -936,7 +945,7 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
             }
         }
 
-        serversModel_->removeRow(curServerIndex);
+        serversModel_->removeRow(sourceIndex.row());
     } else if (editPasswordAction != nullptr && action == editPasswordAction) { // Edit password
         auto srv{config_.getServer(curServerId)};
 
@@ -989,14 +998,16 @@ void MainWindow::on_profile_currentIndexChanged(int index)
     ui_->sampVersion->setCurrentIndex(profile.samp);
     ui_->comment->setPlainText(profile.comment);
 
-    int currentRow{getCurrentRow()};
-    if (currentRow != -1 && ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
-        quint32 serverId{serversModel_->item(currentRow, 0)->data(Qt::UserRole).value<quint32>()};
+    if (!isManualProfileChanging_) {
+        int currentRow{getCurrentRow()};
+        if (currentRow != -1 && ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
+            quint32 serverId{getItemFromTable(currentRow, 0)->data(Qt::UserRole).value<quint32>()};
 
-        auto srv{config_.getServer(serverId)};
-        if (srv.profile != index) {
-            srv.profile = index;
-            config_.setServer(serverId, srv);
+            auto srv{config_.getServer(serverId)};
+            if (srv.profile != index) {
+                srv.profile = index;
+                config_.setServer(serverId, srv);
+            }
         }
     }
 }
@@ -1189,7 +1200,7 @@ void MainWindow::updateServerInfo()
  */
 
     // Ping all servers.
-    for (int i{0}; i < serversModel_->rowCount(); ++i) {
+    for (int i{0}; i < serversProxyModel_->rowCount(); ++i) {
         pingServerInTable(i);
     }
 }
@@ -1198,7 +1209,7 @@ void MainWindow::pingServerInTable(int row)
 {
     // Todo: Create a queue of ping query.
 
-    auto    addressRow{serversModel_->item(row, 5)};
+    auto    addressRow{getItemFromTable(row, 5)};
     QString serverAddress{addressRow->text()};
 
     auto sq{addressRow->data(Qt::UserRole).value<SampQuery*>()};
@@ -1210,22 +1221,22 @@ void MainWindow::pingServerInTable(int row)
         sq = new SampQuery(serverAddress);
         addressRow->setData(QVariant::fromValue(sq), Qt::UserRole);
 
-        auto pingItem{serversModel_->item(row, 2)};
+        auto pingItem{getItemFromTable(row, 2)};
 
         QObject::connect(sq, &SampQuery::pingCalculated, this, [this, pingItem](int ping) {
             QString pingStr{QString::number(ping)};
 
             pingItem->setText(pingStr);
 
-            if (serversModel_->item(getCurrentRow(), 2) == pingItem) {
+            if (getItemFromTable(getCurrentRow(), 2) == pingItem) {
                 ui_->serverPing->setText(pingStr);
             }
         });
 
-        auto hostnameItem{serversModel_->item(row, 0)};
-        auto onlineItem{serversModel_->item(row, 1)};
-        auto modeItem{serversModel_->item(row, 3)};
-        auto languageItem{serversModel_->item(row, 4)};
+        auto hostnameItem{getItemFromTable(row, 0)};
+        auto onlineItem{getItemFromTable(row, 1)};
+        auto modeItem{getItemFromTable(row, 3)};
+        auto languageItem{getItemFromTable(row, 4)};
 
         QObject::connect(sq,
                          &SampQuery::serverInfoResponse,
@@ -1244,7 +1255,7 @@ void MainWindow::pingServerInTable(int row)
                                  hostnameItem->setForeground(QBrush{ClosedServersColor});
                              }
 
-                             if (serversModel_->item(getCurrentRow(), 0) == hostnameItem) {
+                             if (getItemFromTable(getCurrentRow(), 0) == hostnameItem) {
                                  ui_->serverInfoBox->setTitle(tr("Server Information: ")
                                                               + si.hostname);
                                  ui_->serverPlayers->setText(playersText);
@@ -1257,7 +1268,7 @@ void MainWindow::pingServerInTable(int row)
                          &SampQuery::serverRulesResponse,
                          this,
                          [this, hostnameItem](QMap<QString, QString> rules) {
-                             if (serversModel_->item(getCurrentRow(), 0) != hostnameItem) {
+                             if (getItemFromTable(getCurrentRow(), 0) != hostnameItem) {
                                  return;
                              }
 
@@ -1304,9 +1315,9 @@ void MainWindow::launchGameWithServerOnRow(int row)
 
     QString address, password;
     if (ui_->group->currentIndex() == INDEX_INTERNET_GROUP) {
-        address = serversModel_->item(row, 5)->text();
+        address = getItemFromTable(row, 5)->text();
     } else {
-        quint32 serverId{serversModel_->item(row, 0)->data(Qt::UserRole).value<quint32>()};
+        quint32 serverId{getItemFromTable(row, 0)->data(Qt::UserRole).value<quint32>()};
         auto    srv{config_.getServer(serverId)};
 
         address  = srv.address;

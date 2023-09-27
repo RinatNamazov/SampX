@@ -118,8 +118,10 @@ private:
     SampQuery                   sampQuery_;
     SettingsData                config_;
     QTimer*                     pingTimer_;
+    bool                        isManualProfileChanging_;
 
-    int getCurrentRow();
+    int            getCurrentRow();
+    QStandardItem* getItemFromTable(int row, int column);
 
     void loadLastTheme();
     void setLastWindowsSizeAndPos();
