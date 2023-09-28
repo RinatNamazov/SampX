@@ -559,6 +559,10 @@
     <addaction name="separator"/>
     <addaction name="actionPingInterval"/>
     <addaction name="actionPingOnlySelectedServer"/>
+    <addaction name="separator"/>
+    <addaction name="actionSaveLastWindowSize"/>
+    <addaction name="actionSaveLastWindowPosition"/>
+    <addaction name="actionSaveLastColumnWidth"/>
    </widget>
    <addaction name="menuHelp"/>
    <addaction name="menuSettings"/>
@@ -639,6 +643,30 @@
   <action name="actionPingInterval">
    <property name="text">
     <string>Ping interval</string>
+   </property>
+  </action>
+  <action name="actionSaveLastWindowSize">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Save the last window size</string>
+   </property>
+  </action>
+  <action name="actionSaveLastWindowPosition">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Save the last window position</string>
+   </property>
+  </action>
+  <action name="actionSaveLastColumnWidth">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Save the last column width</string>
    </property>
   </action>
  </widget>

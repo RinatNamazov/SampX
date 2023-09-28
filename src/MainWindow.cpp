@@ -145,12 +145,6 @@ MainWindow::MainWindow(QWidget* parent)
                      this,
                      &MainWindow::on_servers_currentRowChanged);
 
-    setLastWindowsSizeAndPos();
-    loadLastTheme();
-    createLanguageMenu();
-    loadLastLanguage();
-    setLastServersColumnWidth();
-
     // Is this the first launch?
     if (!config_.load("./sampx.dat")) {
         createDefaultConfig();
@@ -214,6 +208,12 @@ MainWindow::MainWindow(QWidget* parent)
 
     bool pingOnlySelected{settings_->value("ping_only_selected_server", false).toBool()};
     ui_->actionPingOnlySelectedServer->setChecked(pingOnlySelected);
+
+    setLastWindowsSizeAndPos();
+    setLastServersColumnWidth();
+    loadLastTheme();
+    createLanguageMenu();
+    loadLastLanguage();
 }
 
 MainWindow::~MainWindow()
@@ -268,6 +268,10 @@ void MainWindow::closeEvent(QCloseEvent*)
     settings_->setValue("size", size());
     settings_->setValue("pos", pos());
     settings_->setValue("maximized", isMaximized());
+
+    settings_->setValue("save_last_size", ui_->actionSaveLastWindowSize->isChecked());
+    settings_->setValue("save_last_pos", ui_->actionSaveLastWindowPosition->isChecked());
+    settings_->setValue("save_last_column_width", ui_->actionSaveLastColumnWidth->isChecked());
 
     settings_->setValue("language", currLang_);
 
@@ -340,26 +344,33 @@ void MainWindow::loadLastTheme()
 
 void MainWindow::setLastWindowsSizeAndPos()
 {
-    if (settings_->value("maximized", false).toBool()) {
-        showMaximized();
-        return;
+    bool saveLastSize{settings_->value("save_last_size", true).toBool()};
+    bool saveLastPos{settings_->value("save_last_pos", true).toBool()};
+
+    ui_->actionSaveLastWindowSize->setChecked(saveLastSize);
+    ui_->actionSaveLastWindowPosition->setChecked(saveLastPos);
+
+    if (saveLastSize) {
+        if (settings_->value("maximized", false).toBool()) {
+            showMaximized();
+            return;
+        }
     }
 
     const QSize defaultWinSize{1200, 650};
 
     QVariant lastSize{settings_->value("size")};
-    if (lastSize.isNull() || lastSize.userType() != QMetaType::QSize) {
+    if (!saveLastSize || lastSize.isNull() || lastSize.userType() != QMetaType::QSize) {
         resize(defaultWinSize);
     } else {
         resize(lastSize.toSize());
     }
 
-    QList<QScreen*> screens{QGuiApplication::screens()};
-    QRect           screenGeo{screens.first()->availableGeometry()};
+    QRect screenGeo{QGuiApplication::primaryScreen()->availableGeometry()};
 
     QPoint   lastPos;
     QVariant lp{settings_->value("pos")};
-    if (lp.isNull() || lp.userType() != QMetaType::QPoint) {
+    if (!saveLastPos || lp.isNull() || lp.userType() != QMetaType::QPoint) {
         lastPos = screenGeo.center() - rect().center();
     } else {
         lastPos = lp.toPoint();
@@ -383,25 +394,30 @@ void MainWindow::loadLastLanguage()
 
 void MainWindow::setLastServersColumnWidth()
 {
-    QVariant lastColumnWidth{settings_->value("column_width")};
-    if (!lastColumnWidth.isNull() && lastColumnWidth.userType() == QMetaType::QStringList) {
-        QStringList colWidth{lastColumnWidth.toStringList()};
-        if (colWidth.count() <= serversModel_->columnCount()) {
-            for (int i{0}; i < colWidth.count(); ++i) {
-                uint width{colWidth[i].toUInt()};
-                ui_->servers->setColumnWidth(i, width);
-            }
-            return;
-        }
-    }
+    bool saveLastColumnWidth{settings_->value("save_last_column_width", true).toBool()};
+    ui_->actionSaveLastColumnWidth->setChecked(saveLastColumnWidth);
 
-    // Default
-    ui_->servers->setColumnWidth(0, 271); // HostName
-    ui_->servers->setColumnWidth(1, 88);  // Players
-    ui_->servers->setColumnWidth(2, 51);  // Ping
-    ui_->servers->setColumnWidth(3, 119); // Mode
-    ui_->servers->setColumnWidth(4, 114); // Language
-    ui_->servers->setColumnWidth(5, 150); // Address
+    if (saveLastColumnWidth) {
+        QVariant lastColumnWidth{settings_->value("column_width")};
+        if (!lastColumnWidth.isNull() && lastColumnWidth.userType() == QMetaType::QStringList) {
+            QStringList colWidth{lastColumnWidth.toStringList()};
+            if (colWidth.count() <= serversModel_->columnCount()) {
+                for (int i{0}; i < colWidth.count(); ++i) {
+                    uint width{colWidth[i].toUInt()};
+                    ui_->servers->setColumnWidth(i, width);
+                }
+                return;
+            }
+        }
+    } else {
+        // Default
+        ui_->servers->setColumnWidth(0, 271); // HostName
+        ui_->servers->setColumnWidth(1, 88);  // Players
+        ui_->servers->setColumnWidth(2, 51);  // Ping
+        ui_->servers->setColumnWidth(3, 119); // Mode
+        ui_->servers->setColumnWidth(4, 114); // Language
+        ui_->servers->setColumnWidth(5, 150); // Address
+    }
 }
 
 void MainWindow::createDefaultConfig()
