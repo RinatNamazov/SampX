@@ -14,6 +14,7 @@
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QHostInfo>
 #include <QInputDialog>
 #include <QList>
 #include <QMessageBox>
@@ -805,18 +806,7 @@ void MainWindow::on_servers_doubleClicked(const QModelIndex& index)
     if (index.row() == -1) {
         return;
     }
-
-    QString address, password;
-    if (ui_->group->currentIndex() == INDEX_INTERNET_GROUP) {
-        address = getItemFromTable(index.row(), 5)->text();
-    } else {
-        quint32 serverId{getItemFromTable(index.row(), 0)->data(Qt::UserRole).value<quint32>()};
-        auto    srv{config_.getServer(serverId)};
-        address  = srv.address;
-        password = srv.password;
-    }
-
-    launchGame(address, password);
+    launchGameWithServerOnRow(index.row());
 }
 
 void MainWindow::on_servers_sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
@@ -1325,7 +1315,27 @@ void MainWindow::launchGameWithServerOnRow(int row)
         password = srv.password;
     }
 
-    launchGame(address, password);
+    // Todo: Frequently extracting the port from the address, refactor later.
+    int pos{address.lastIndexOf(':')};
+    if (pos == -1) {
+        return;
+    }
+    QString addr{address.mid(0, pos)};
+    quint16 port{static_cast<quint16>(address.mid(pos + 1).toShort())};
+
+    QHostInfo::lookupHost(addr, this, [this, port, password](const QHostInfo& host) {
+        if (host.error() != QHostInfo::HostInfoError::NoError) {
+            qDebug() << "IP Lookup failed:" << host.errorString();
+            QMessageBox::warning(this,
+                                 tr("Error"),
+                                 tr("IP Lookup failed: ") + host.errorString(),
+                                 QMessageBox::Ok);
+
+            return;
+        }
+        auto resolvedIp{host.addresses().first().toString() + ":" + QString::number(port)};
+        launchGame(resolvedIp, password);
+    });
 }
 
 void MainWindow::launchGame(const QString& address, const QString& password)

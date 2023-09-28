@@ -22,7 +22,7 @@ GameLauncher::GameLauncher()
     , gameExe_("gta_sa.exe")
     , sampDll_("samp.dll")
 {
-HMODULE kernel32Library{GetModuleHandleA("kernel32.dll")};
+    HMODULE kernel32Library{GetModuleHandleA("kernel32.dll")};
     if (!kernel32Library) {
         QMessageBox::critical(nullptr,
                               tr("Error"),
@@ -64,7 +64,7 @@ void GameLauncher::setAddress(QString address)
 {
     address_ = address;
 
-int pos{address_.lastIndexOf(':')};
+    int pos{address_.lastIndexOf(':')};
     if (pos != -1) {
         ip_   = address_.mid(0, pos);
         port_ = address_.mid(pos + 1).toShort();
@@ -88,7 +88,7 @@ void GameLauncher::setProxy(QPair<QString, QString> proxy)
 
 bool GameLauncher::launch()
 {
-QString commandLine{QString("-c -h %1 -p %2 -n %3").arg(ip_).arg(port_).arg(nickname_)};
+    QString commandLine{QString("-c -h %1 -p %2 -n %3").arg(ip_).arg(port_).arg(nickname_)};
     if (!password_.isEmpty()) {
         commandLine += QString(" -z %1").arg(password_);
     }
