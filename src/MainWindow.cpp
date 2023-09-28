@@ -97,7 +97,7 @@ MainWindow::MainWindow(QWidget* parent)
     QCoreApplication::setOrganizationName("RINWARES");
     QCoreApplication::setOrganizationDomain("rinwares.com");
     QCoreApplication::setApplicationName("SampX");
-    QCoreApplication::setApplicationVersion("v.1.0.2-alpha");
+    QCoreApplication::setApplicationVersion("v.1.1.0-beta");
 
     settings_ = new QSettings();
 
@@ -623,8 +623,8 @@ TG: <a href='https://t.me/rinwares_official'><span style="text-decoration: none;
 Discord: <a href='https://rinwares.com/discord'><span style="text-decoration: none; color:white;">rinwares.com/discord</span></a><br/>
 BlastHack: <a href='https://www.blast.hk/threads/105888/'><span style="text-decoration: none; color:white;">blast.hk/threads/105888/</span></a><br/><br/>
 %5: <a href='https://t.me/Rinat_Namazov'><span style="text-decoration: none; color:white;">Rinat Namazov</span></a><br/><br/>
-%6: <a href='https://rinwares.com/donate'><span style="text-decoration: none; color:white;">rinwares.com/donate</span></a><br/><br/>
-Copyright © 2021 RINWARES. All rights reserved.)")
+%6: <a href='https://rinwares.com/donate'><span style="text-decoration: none; color:white;">rinwares.com/donate</span></a><br/>
+<p style='text-align:center'>Copyright © 2021, 2023 RINWARES.<br/>All rights reserved.</p>)")
                        .arg(tr("Version"),
                             QCoreApplication::applicationVersion(),
                             tr("The custom launcher of SA-MP"),
