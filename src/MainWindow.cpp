@@ -208,7 +208,12 @@ MainWindow::MainWindow(QWidget* parent)
 
     pingTimer_ = new QTimer(this);
     QObject::connect(pingTimer_, &QTimer::timeout, this, &MainWindow::updateServerInfo);
-    pingTimer_->start(1000);
+
+    auto pingInterval{settings_->value("ping_interval", 1000).toInt()};
+    pingTimer_->start(pingInterval);
+
+    bool pingOnlySelected{settings_->value("ping_only_selected_server", false).toBool()};
+    ui_->actionPingOnlySelectedServer->setChecked(pingOnlySelected);
 }
 
 MainWindow::~MainWindow()
@@ -225,6 +230,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::changeEvent(QEvent* event)
 {
+    static bool isFirstStart{true};
+
     if (event != nullptr) {
         switch (event->type()) {
             case QEvent::LanguageChange:
@@ -235,6 +242,14 @@ void MainWindow::changeEvent(QEvent* event)
                 break;
             case QEvent::ActivationChange:
                 if (isActiveWindow()) {
+                    if (isFirstStart) {
+                        isFirstStart = false;
+                        for (int i{0}; i < serversProxyModel_->rowCount(); ++i) {
+                            pingServerInTable(i);
+                        }
+                        return;
+                    }
+
                     pingTimer_->start();
                 } else {
                     pingTimer_->stop();
@@ -258,6 +273,9 @@ void MainWindow::closeEvent(QCloseEvent*)
 
     settings_->setValue("group", ui_->group->currentIndex());
     settings_->setValue("profile", ui_->profile->currentIndex());
+
+    settings_->setValue("ping_only_selected_server", ui_->actionPingOnlySelectedServer->isChecked());
+    settings_->setValue("ping_interval", pingTimer_->interval());
 
     QStringList colWidth;
     colWidth.reserve(6);
@@ -632,6 +650,28 @@ void MainWindow::on_actionLight_triggered()
     settings_->setValue("theme", "light");
 }
 
+void MainWindow::on_actionPingInterval_triggered()
+{
+    bool    ok{false};
+    QString input{QInputDialog::getText(this,
+                                        tr("Ping interval"),
+                                        tr("Enter new ping interval in milliseconds"),
+                                        QLineEdit::Normal,
+                                        QString::number(pingTimer_->interval()),
+                                        &ok)};
+    if (!ok || input.isEmpty()) {
+        return;
+    }
+
+    bool isInt{false};
+    int  interval{input.toInt(&isInt)};
+    if (!isInt) {
+        return;
+    }
+
+    pingTimer_->setInterval(interval);
+}
+
 void MainWindow::on_connectButton_clicked()
 {
     launchGameWithServerOnRow(getCurrentRow());
@@ -756,7 +796,7 @@ void MainWindow::on_deleteGroupButton_clicked()
 
 void MainWindow::on_addServerButton_clicked()
 {
-    bool    ok;
+    bool    ok{false};
     QString serverAddr{QInputDialog::getText(this,
                                              tr("Add server"),
                                              tr("Enter new server host:port"),
@@ -939,7 +979,7 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
     } else if (editPasswordAction != nullptr && action == editPasswordAction) { // Edit password
         auto srv{config_.getServer(curServerId)};
 
-        bool    ok;
+        bool    ok{false};
         QString pass = QInputDialog::getText(this,
                                              tr("Add server"),
                                              tr("Enter server password"),
@@ -1180,19 +1220,15 @@ void MainWindow::on_deleteProfileButton_clicked()
 
 void MainWindow::updateServerInfo()
 {
-    // Todo: Add this to the settings.
-    /*
-    // Ping only selected server.
-    int row{getCurrentRow()};
-    if (row != -1) {
-        pingServerInTable(row);
-    }
-    pingTimer_->start(1000);
- */
-
-    // Ping all servers.
-    for (int i{0}; i < serversProxyModel_->rowCount(); ++i) {
-        pingServerInTable(i);
+    if (ui_->actionPingOnlySelectedServer->isChecked()) {
+        int row{getCurrentRow()};
+        if (row != -1) {
+            pingServerInTable(row);
+        }
+    } else {
+        for (int i{0}; i < serversProxyModel_->rowCount(); ++i) {
+            pingServerInTable(i);
+        }
     }
 }
 

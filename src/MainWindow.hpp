@@ -71,6 +71,8 @@ private slots:
     void on_actionDark_triggered();
     void on_actionLight_triggered();
 
+    void on_actionPingInterval_triggered();
+
     void on_connectButton_clicked();
 
     void on_search_textChanged(const QString& text);

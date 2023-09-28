@@ -523,7 +523,7 @@
      <x>0</x>
      <y>0</y>
      <width>816</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -556,6 +556,9 @@
     <addaction name="actionSamp"/>
     <addaction name="actionProxy"/>
     <addaction name="actionAdapter"/>
+    <addaction name="separator"/>
+    <addaction name="actionPingInterval"/>
+    <addaction name="actionPingOnlySelectedServer"/>
    </widget>
    <addaction name="menuHelp"/>
    <addaction name="menuSettings"/>
@@ -620,6 +623,22 @@
   <action name="actionAdapter">
    <property name="text">
     <string>Adapter (VPN)</string>
+   </property>
+  </action>
+  <action name="actionPingOnlySelectedServer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Ping only selected server</string>
+   </property>
+  </action>
+  <action name="actionPingInterval">
+   <property name="text">
+    <string>Ping interval</string>
    </property>
   </action>
  </widget>
