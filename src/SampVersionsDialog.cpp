@@ -50,8 +50,8 @@ void SampVersionsDialog::on_deleteButton_clicked()
 
 void SampVersionsDialog::on_buttonBox_accepted()
 {
-quint32 sampVersionCount{config_->getSampVersionCount()};
-    int rowCount{ui_->versions->rowCount()};
+    quint32 sampVersionCount{config_->getSampVersionCount()};
+    int     rowCount{ui_->versions->rowCount()};
 
     for (int i{rowCount}; i < sampVersionCount; ++i) {
         config_->deleteSampVersion(i);

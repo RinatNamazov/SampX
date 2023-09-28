@@ -103,10 +103,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui_->setupUi(this);
 
-    sampVersionsDialog_ = new SampVersionsDialog(&config_, ui_->sampVersion, this);
-    adaptersDialog_     = new AdaptersDialog(&config_, ui_->adapter, this);
-    proxysDialog_       = new ProxysDialog(&config_, ui_->proxy, this);
-
     serversModel_      = new QStandardItemModel(this);
     serversProxyModel_ = new CustomSortFilterProxyModel(this);
 
@@ -149,6 +145,10 @@ MainWindow::MainWindow(QWidget* parent)
     if (!config_.load("./sampx.dat")) {
         createDefaultConfig();
     }
+
+    sampVersionsDialog_ = new SampVersionsDialog(&config_, ui_->sampVersion, this);
+    adaptersDialog_     = new AdaptersDialog(&config_, ui_->adapter, this);
+    proxysDialog_       = new ProxysDialog(&config_, ui_->proxy, this);
 
     ui_->group->addItem("Internet");
     for (quint32 i{0}; i < config_.getGroupCount(); ++i) {
