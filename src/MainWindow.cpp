@@ -854,7 +854,7 @@ void MainWindow::on_addServerButton_clicked()
     int idx{serversModel_->rowCount()};
     serversModel_->insertRow(serversModel_->rowCount());
 
-    auto hostnameItem{new QStandardItem()};
+    auto hostnameItem{new QStandardItem(tr("Not Available"))};
     hostnameItem->setData(QVariant::fromValue(serverId), Qt::UserRole);
     serversModel_->setItem(idx, 0, hostnameItem);
     for (int i{1}; i <= 4; ++i) {

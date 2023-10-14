@@ -367,6 +367,7 @@
     <message>
         <location filename="../src/MainWindow.cpp" line="296"/>
         <location filename="../src/MainWindow.cpp" line="747"/>
+        <location filename="../src/MainWindow.cpp" line="857"/>
         <source>Not Available</source>
         <translation type="unfinished">Не доступно</translation>
     </message>
