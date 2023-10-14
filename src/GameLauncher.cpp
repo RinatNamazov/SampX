@@ -195,6 +195,7 @@ void GameLauncher::replaceSampLibrary(const QString& sampDll)
 
     QString sampDllPath{QFileInfo(gameDir_, sampDll_).filePath()};
     if (QFile::exists(sampDllPath)) {
+        // If the game is already running, you will not be able to delete the library.
         QString trashDir{gameDir_.absoluteFilePath("sampx_trash")};
 
         QDir qd(trashDir);

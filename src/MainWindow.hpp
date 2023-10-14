@@ -64,6 +64,7 @@ private slots:
     void on_actionAbout_triggered();
     void on_actionAboutQt_triggered();
 
+    void on_actionProfileSystem_triggered(bool checked);
     void on_actionSamp_triggered();
     void on_actionProxy_triggered();
     void on_actionAdapter_triggered();
@@ -92,6 +93,7 @@ private slots:
     void on_profile_currentIndexChanged(int index);
 
     void on_profile_editTextChanged(const QString& text);
+    void on_nickname2_editingFinished();
     void on_nickname_editingFinished();
     void on_adapter_currentIndexChanged(int index);
     void on_proxy_currentIndexChanged(int index);

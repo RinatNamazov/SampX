@@ -97,6 +97,34 @@
               </item>
              </layout>
             </item>
+            <item>
+             <widget class="QGroupBox" name="nicknameBox">
+              <property name="maximumSize">
+               <size>
+                <width>209</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>NickName:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_3">
+               <item>
+                <widget class="QLineEdit" name="nickname2">
+                 <property name="maximumSize">
+                  <size>
+                   <width>200</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -324,7 +352,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QGroupBox" name="accountBox">
+     <widget class="QGroupBox" name="profileBox">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -553,6 +581,8 @@
     </widget>
     <addaction name="menuLanguage"/>
     <addaction name="menuTheme"/>
+    <addaction name="separator"/>
+    <addaction name="actionProfileSystem"/>
     <addaction name="actionSamp"/>
     <addaction name="actionProxy"/>
     <addaction name="actionAdapter"/>
@@ -601,6 +631,14 @@
    </property>
    <property name="text">
     <string>VPN</string>
+   </property>
+  </action>
+  <action name="actionProfileSystem">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable the profile system</string>
    </property>
   </action>
   <action name="actionSamp">
@@ -667,6 +705,11 @@
    </property>
    <property name="text">
     <string>Save the last column width</string>
+   </property>
+  </action>
+  <action name="actionSpecifyGameDirectory">
+   <property name="text">
+    <string>Specify game directory</string>
    </property>
   </action>
  </widget>

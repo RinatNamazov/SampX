@@ -204,6 +204,10 @@ MainWindow::MainWindow(QWidget* parent)
     loadLastTheme();
     createLanguageMenu();
     loadLastLanguage();
+
+    bool profileSystemEnabled{settings_->value("profile_system", false).toBool()};
+    ui_->actionProfileSystem->setChecked(profileSystemEnabled);
+    on_actionProfileSystem_triggered(profileSystemEnabled);
 }
 
 MainWindow::~MainWindow()
@@ -258,6 +262,8 @@ void MainWindow::closeEvent(QCloseEvent*)
     settings_->setValue("size", size());
     settings_->setValue("pos", pos());
     settings_->setValue("maximized", isMaximized());
+
+    settings_->setValue("profile_system", ui_->actionProfileSystem->isChecked());
 
     settings_->setValue("save_last_size", ui_->actionSaveLastWindowSize->isChecked());
     settings_->setValue("save_last_pos", ui_->actionSaveLastWindowPosition->isChecked());
@@ -627,6 +633,22 @@ BlastHack: <a href='https://www.blast.hk/threads/105888/'><span style="text-deco
 void MainWindow::on_actionAboutQt_triggered()
 {
     QMessageBox::aboutQt(this);
+}
+
+void MainWindow::on_actionProfileSystem_triggered(bool checked)
+{
+    if (checked) {
+        ui_->nicknameBox->hide();
+        ui_->profileBox->show();
+
+    } else {
+        ui_->profileBox->hide();
+        ui_->nicknameBox->show();
+    }
+
+    ui_->actionSamp->setEnabled(checked);
+    ui_->actionProxy->setEnabled(checked);
+    ui_->actionAdapter->setEnabled(checked);
 }
 
 void MainWindow::on_actionSamp_triggered()
@@ -1027,6 +1049,7 @@ void MainWindow::on_profile_currentIndexChanged(int index)
 
     auto profile{config_.getProfile(index)};
     ui_->nickname->setText(profile.nickname);
+    ui_->nickname2->setText(profile.nickname);
     ui_->proxy->setCurrentIndex(getIndexOfGroupOrProxyOrAdapter(profile.proxy));
     ui_->adapter->setCurrentIndex(getIndexOfGroupOrProxyOrAdapter(profile.adapter));
     ui_->gameDir->setText(config_.getGameDir(profile.gameDir));
@@ -1063,6 +1086,13 @@ void MainWindow::on_profile_editTextChanged(const QString& text)
     profile.name = text;
     config_.setProfile(profileId, profile);
     ui_->profile->setItemText(profileId, text);
+}
+
+void MainWindow::on_nickname2_editingFinished()
+{
+    // The default profile is always used if the profile system is disabled.
+    ui_->nickname->setText(ui_->nickname2->text());
+    on_nickname_editingFinished();
 }
 
 void MainWindow::on_nickname_editingFinished()

@@ -79,9 +79,9 @@
     </message>
     <message>
         <location filename="../src/MainWindow.ui" line="94"/>
-        <location filename="../src/MainWindow.cpp" line="817"/>
-        <location filename="../src/MainWindow.cpp" line="920"/>
-        <location filename="../src/MainWindow.cpp" line="1000"/>
+        <location filename="../src/MainWindow.cpp" line="829"/>
+        <location filename="../src/MainWindow.cpp" line="932"/>
+        <location filename="../src/MainWindow.cpp" line="1012"/>
         <source>Add server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -106,7 +106,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="551"/>
+        <location filename="../src/MainWindow.ui" line="579"/>
         <location filename="../src/MainWindow.cpp" line="122"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
@@ -117,332 +117,343 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="137"/>
+        <location filename="../src/MainWindow.ui" line="165"/>
         <source>Server Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="145"/>
+        <location filename="../src/MainWindow.ui" line="173"/>
         <source>Address:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="162"/>
+        <location filename="../src/MainWindow.ui" line="190"/>
         <source>Players:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="179"/>
+        <location filename="../src/MainWindow.ui" line="207"/>
         <source>Ping:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="196"/>
+        <location filename="../src/MainWindow.ui" line="224"/>
         <source>Mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="213"/>
+        <location filename="../src/MainWindow.ui" line="241"/>
         <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="234"/>
+        <location filename="../src/MainWindow.ui" line="262"/>
         <source>Map:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="251"/>
+        <location filename="../src/MainWindow.ui" line="279"/>
         <source>Weather:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="268"/>
+        <location filename="../src/MainWindow.ui" line="296"/>
         <source>WorldTime:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="285"/>
+        <location filename="../src/MainWindow.ui" line="313"/>
         <source>URL:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="305"/>
+        <location filename="../src/MainWindow.ui" line="333"/>
         <source>Version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="349"/>
+        <location filename="../src/MainWindow.ui" line="377"/>
         <source>Profile:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="363"/>
+        <location filename="../src/MainWindow.ui" line="109"/>
+        <location filename="../src/MainWindow.ui" line="391"/>
         <source>NickName:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="377"/>
+        <location filename="../src/MainWindow.ui" line="405"/>
         <source>Works only with RiProxy.asi installed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="380"/>
+        <location filename="../src/MainWindow.ui" line="408"/>
         <source>Proxy:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="394"/>
+        <location filename="../src/MainWindow.ui" line="422"/>
         <source>Works only with RiNetworkAdapter.asi installed, can be used for a VPN.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="397"/>
+        <location filename="../src/MainWindow.ui" line="425"/>
         <source>Adapter:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="407"/>
+        <location filename="../src/MainWindow.ui" line="435"/>
         <source>Game dir:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="429"/>
+        <location filename="../src/MainWindow.ui" line="457"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="448"/>
+        <location filename="../src/MainWindow.ui" line="476"/>
         <source>GTA:SA:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="455"/>
+        <location filename="../src/MainWindow.ui" line="483"/>
         <source>SA-MP:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="462"/>
+        <location filename="../src/MainWindow.ui" line="490"/>
         <source>Comment:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="485"/>
+        <location filename="../src/MainWindow.ui" line="513"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="494"/>
+        <location filename="../src/MainWindow.ui" line="522"/>
         <source>Create new profile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="507"/>
+        <location filename="../src/MainWindow.ui" line="535"/>
         <source>Delete profile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="531"/>
+        <location filename="../src/MainWindow.ui" line="559"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="540"/>
+        <location filename="../src/MainWindow.ui" line="568"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="544"/>
+        <location filename="../src/MainWindow.ui" line="572"/>
         <source>Theme</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="572"/>
+        <location filename="../src/MainWindow.ui" line="602"/>
         <source>Check for updates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="577"/>
-        <location filename="../src/MainWindow.cpp" line="631"/>
+        <location filename="../src/MainWindow.ui" line="607"/>
+        <location filename="../src/MainWindow.cpp" line="627"/>
         <source>Site</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="582"/>
+        <location filename="../src/MainWindow.ui" line="612"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="587"/>
+        <location filename="../src/MainWindow.ui" line="617"/>
         <source>About Qt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="595"/>
+        <location filename="../src/MainWindow.ui" line="625"/>
         <source>Proxy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="603"/>
+        <location filename="../src/MainWindow.ui" line="633"/>
         <source>VPN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="608"/>
+        <location filename="../src/MainWindow.ui" line="641"/>
+        <source>Enable the profile system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.ui" line="646"/>
         <source>SA-MP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="616"/>
+        <location filename="../src/MainWindow.ui" line="654"/>
         <source>Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="624"/>
+        <location filename="../src/MainWindow.ui" line="662"/>
         <source>Light</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="629"/>
+        <location filename="../src/MainWindow.ui" line="667"/>
         <source>Adapter (VPN)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="640"/>
+        <location filename="../src/MainWindow.ui" line="678"/>
         <source>Ping only selected server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="645"/>
-        <location filename="../src/MainWindow.cpp" line="673"/>
+        <location filename="../src/MainWindow.ui" line="683"/>
+        <location filename="../src/MainWindow.cpp" line="685"/>
         <source>Ping interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="653"/>
+        <location filename="../src/MainWindow.ui" line="691"/>
         <source>Save the last window size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="661"/>
+        <location filename="../src/MainWindow.ui" line="699"/>
         <source>Save the last window position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.ui" line="669"/>
+        <location filename="../src/MainWindow.ui" line="707"/>
         <source>Save the last column width</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="952"/>
+        <location filename="../src/MainWindow.ui" line="712"/>
+        <source>Specify game directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/MainWindow.cpp" line="964"/>
         <source>Add to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="961"/>
+        <location filename="../src/MainWindow.cpp" line="973"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="962"/>
+        <location filename="../src/MainWindow.cpp" line="974"/>
         <source>Edit password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1001"/>
+        <location filename="../src/MainWindow.cpp" line="1013"/>
         <source>Enter server password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="300"/>
-        <location filename="../src/MainWindow.cpp" line="735"/>
+        <location filename="../src/MainWindow.cpp" line="296"/>
+        <location filename="../src/MainWindow.cpp" line="747"/>
         <source>Not Available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="485"/>
-        <location filename="../src/MainWindow.cpp" line="1382"/>
+        <location filename="../src/MainWindow.cpp" line="481"/>
+        <location filename="../src/MainWindow.cpp" line="1402"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="485"/>
+        <location filename="../src/MainWindow.cpp" line="481"/>
         <source>Failed to save config file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="613"/>
+        <location filename="../src/MainWindow.cpp" line="609"/>
         <source>SampX About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="628"/>
+        <location filename="../src/MainWindow.cpp" line="624"/>
         <source>Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="630"/>
+        <location filename="../src/MainWindow.cpp" line="626"/>
         <source>The custom launcher of SA-MP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="632"/>
+        <location filename="../src/MainWindow.cpp" line="628"/>
         <source>Developer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="633"/>
+        <location filename="../src/MainWindow.cpp" line="629"/>
         <source>Donate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="674"/>
+        <location filename="../src/MainWindow.cpp" line="686"/>
         <source>Enter new ping interval in milliseconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="795"/>
+        <location filename="../src/MainWindow.cpp" line="807"/>
         <source>Are you sure you want to delete the current group?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="818"/>
+        <location filename="../src/MainWindow.cpp" line="830"/>
         <source>Enter new server host:port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="896"/>
-        <location filename="../src/MainWindow.cpp" line="1302"/>
+        <location filename="../src/MainWindow.cpp" line="908"/>
+        <location filename="../src/MainWindow.cpp" line="1322"/>
         <source>Server Information: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1142"/>
+        <location filename="../src/MainWindow.cpp" line="1162"/>
         <source>Select the directory with the game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1383"/>
+        <location filename="../src/MainWindow.cpp" line="1403"/>
         <source>IP Lookup failed: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1397"/>
+        <location filename="../src/MainWindow.cpp" line="1417"/>
         <source>You have an empty nickname.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1403"/>
+        <location filename="../src/MainWindow.cpp" line="1423"/>
         <source>You have an empty game directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1409"/>
+        <location filename="../src/MainWindow.cpp" line="1429"/>
         <source>You have an empty game executable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/MainWindow.cpp" line="1415"/>
+        <location filename="../src/MainWindow.cpp" line="1435"/>
         <source>You have an empty samp version.</source>
         <translation type="unfinished"></translation>
     </message>
