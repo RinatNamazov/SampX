@@ -124,7 +124,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     auto header{new QHeaderView(Qt::Horizontal)};
     ui_->servers->setHorizontalHeader(header);
-    ui_->servers->setSortingEnabled(true);
     header->setModel(headerModel);
     header->setSectionsClickable(true);
 
@@ -852,7 +851,7 @@ void MainWindow::on_addServerButton_clicked()
     quint32 serverId{config_.addServer(server)};
 
     int idx{serversModel_->rowCount()};
-    serversModel_->insertRow(serversModel_->rowCount());
+    serversModel_->insertRow(idx);
 
     auto hostnameItem{new QStandardItem(tr("Not Available"))};
     hostnameItem->setData(QVariant::fromValue(serverId), Qt::UserRole);
@@ -881,6 +880,7 @@ void MainWindow::on_servers_sortIndicatorChanged(int logicalIndex, Qt::SortOrder
 {
     auto header{ui_->servers->horizontalHeader()};
     header->setSortIndicatorShown(true);
+    ui_->servers->setSortingEnabled(true);
     QObject::disconnect(header,
                         &QHeaderView::sortIndicatorChanged,
                         this,
