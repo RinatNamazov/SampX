@@ -156,16 +156,6 @@ MainWindow::MainWindow(QWidget* parent)
         ui_->group->addItem(group);
     }
 
-    for (quint32 i{0}; i < config_.getSampVersionCount(); ++i) {
-        QPair<QString, QString> sv{config_.getSampVersion(i)};
-        ui_->sampVersion->addItem(sv.first);
-        ui_->sampVersion->setItemData(i, sv.second);
-    }
-
-    for (quint32 i{0}; i < config_.getAdapterCount(); ++i) {
-        ui_->adapter->addItem(config_.getAdapter(i));
-    }
-
     for (quint32 i{0}; i < config_.getProfileCount(); ++i) {
         auto profile{config_.getProfile(i)};
         ui_->profile->addItem(profile.name);
