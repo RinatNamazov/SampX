@@ -120,20 +120,21 @@ bool GameLauncher::launch()
         return false;
     }
 
-    injectLibrary(gameDir_.filePath(sampDll_));
+    if (!injectLibrary(gameDir_.filePath(sampDll_))) {
+        TerminateProcess(processInfo_.hProcess, 0);
+        return false;
+    }
 
     if (ResumeThread(processInfo_.hThread) == -1) {
+        TerminateProcess(processInfo_.hProcess, 0);
         QMessageBox::critical(nullptr,
                               tr("Failed to start the game"),
                               formatLastWindowsError("ResumeThread"));
         return false;
     }
 
-    if (!CloseHandle(processInfo_.hProcess)) {
-        QMessageBox::warning(nullptr,
-                             tr("Failed to start the game"),
-                             formatLastWindowsError("CloseHandle"));
-    }
+    CloseHandle(processInfo_.hProcess);
+    CloseHandle(processInfo_.hThread);
 
     return true;
 }
@@ -177,6 +178,8 @@ bool GameLauncher::injectLibrary(QString libraryPath)
         if (!VirtualFreeEx(processInfo_.hProcess, parameter, 0, MEM_RELEASE)) {
             throw std::exception(formatLastWindowsError("VirtualFreeEx").toStdString().c_str());
         }
+
+        CloseHandle(loadLibraryThread);
     } catch (const std::exception& e) {
         QMessageBox::critical(nullptr, tr("Failed to inject the library"), e.what());
         return false;
