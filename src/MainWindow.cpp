@@ -1405,7 +1405,16 @@ void MainWindow::launchGameWithServerOnRow(int row)
 
             return;
         }
-        auto resolvedIp{host.addresses().first().toString() + ":" + QString::number(port)};
+
+        QString ip;
+        for (const QHostAddress& addr : host.addresses()) {
+            if (addr.protocol() == QAbstractSocket::IPv4Protocol) {
+                ip = addr.toString();
+                break;
+            }
+        }
+
+        auto resolvedIp{ip + ":" + QString::number(port)};
         launchGame(resolvedIp, password);
     });
 }

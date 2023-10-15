@@ -69,7 +69,13 @@ void SampQuery::setAddress(const QString& address)
                 qDebug() << "Lookup failed:" << host.errorString();
                 return;
             }
-            ip_ = host.addresses().first().toString();
+
+            for (const QHostAddress& addr : host.addresses()) {
+                if (addr.protocol() == QAbstractSocket::IPv4Protocol) {
+                    ip_ = addr.toString();
+                    break;
+                }
+            }
         });
     }
 }
@@ -175,8 +181,7 @@ void SampQuery::processDatagram(QByteArray&& datagram)
     }
 
     QueryPacket* packet{reinterpret_cast<QueryPacket*>(datagram.data())};
-    //QByteArray data{datagram.mid(sizeof(QueryPacket))};
-    QDataStream data(datagram.mid(sizeof(QueryPacket)));
+    QDataStream  data(datagram.mid(sizeof(QueryPacket)));
     data.setByteOrder(QDataStream::LittleEndian);
 
     QTextCodec* codec{QTextCodec::codecForName("cp1251")};
