@@ -114,6 +114,9 @@ void SampQuery::requestDetailedPlayerInfo()
 void SampQuery::requestPing()
 {
     QByteArray data{assemblePacket(QueryPaketOpcode::Ping)};
+    if (data.isEmpty()) {
+        return;
+    }
 
     quint32    tickCount{GetTickCount()};
     QByteArray tickCountData(sizeof(quint32), Qt::Uninitialized);
@@ -224,6 +227,9 @@ void SampQuery::processDatagram(QByteArray&& datagram)
 
 void SampQuery::send(QByteArray data)
 {
+    if (data.isEmpty()) {
+        return;
+    }
     socket_->writeDatagram(data, QHostAddress(ip_), port_);
     sendTime_ = QTime::currentTime().msecsSinceStartOfDay();
     ++sends_;
@@ -231,21 +237,17 @@ void SampQuery::send(QByteArray data)
 
 QByteArray SampQuery::assemblePacket(const QueryPaketOpcode opcode)
 {
-    QByteArray data(sizeof(QueryPacket), Qt::Uninitialized);
-
-    QueryPacket* packet{reinterpret_cast<QueryPacket*>(data.data())};
-
-    packet->tag[0] = 'S';
-    packet->tag[1] = 'A';
-    packet->tag[2] = 'M';
-    packet->tag[3] = 'P';
-
     // Split the IP into 4 bytes.
     auto splitedIp{ip_.split('.')};
-    if (splitedIp.count() == 4) {
-        for (int i{0}; i < 4; ++i) {
-            packet->host[i] = static_cast<char>(splitedIp[i].toInt());
-        }
+    if (splitedIp.count() != 4) {
+        return QByteArray{};
+    }
+
+    QByteArray   data(sizeof(QueryPacket), Qt::Uninitialized);
+    QueryPacket* packet{reinterpret_cast<QueryPacket*>(data.data())};
+
+    for (int i{0}; i < 4; ++i) {
+        packet->host[i] = static_cast<char>(splitedIp[i].toInt());
     }
 
     // Split the port into 2 bytes.
@@ -253,6 +255,11 @@ QByteArray SampQuery::assemblePacket(const QueryPaketOpcode opcode)
     packet->portParts[1] = static_cast<quint8>(port_ >> 8 & 0xFF);
 
     packet->opcode = static_cast<quint8>(opcode);
+
+    packet->tag[0] = 'S';
+    packet->tag[1] = 'A';
+    packet->tag[2] = 'M';
+    packet->tag[3] = 'P';
 
     return data;
 }
