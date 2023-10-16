@@ -103,6 +103,9 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui_->setupUi(this);
 
+    createLanguageMenu();
+    loadLastLanguage();
+
     serversModel_      = new QStandardItemModel(this);
     serversProxyModel_ = new CustomSortFilterProxyModel(this);
 
@@ -198,8 +201,6 @@ MainWindow::MainWindow(QWidget* parent)
     setLastWindowsSizeAndPos();
     setLastServersColumnWidth();
     loadLastTheme();
-    createLanguageMenu();
-    loadLastLanguage();
 
     bool profileSystemEnabled{settings_->value("profile_system", false).toBool()};
     ui_->actionProfileSystem->setChecked(profileSystemEnabled);
@@ -224,9 +225,19 @@ void MainWindow::changeEvent(QEvent* event)
 
     if (event != nullptr) {
         switch (event->type()) {
-            case QEvent::LanguageChange:
+            case QEvent::LanguageChange: {
                 ui_->retranslateUi(this);
+
+                auto header{ui_->servers->horizontalHeader()->model()};
+                header->setHeaderData(0, Qt::Horizontal, tr("HostName"), Qt::DisplayRole);
+                header->setHeaderData(1, Qt::Horizontal, tr("Players"), Qt::DisplayRole);
+                header->setHeaderData(2, Qt::Horizontal, tr("Ping"), Qt::DisplayRole);
+                header->setHeaderData(3, Qt::Horizontal, tr("Mode"), Qt::DisplayRole);
+                header->setHeaderData(4, Qt::Horizontal, tr("Language"), Qt::DisplayRole);
+                header->setHeaderData(5, Qt::Horizontal, tr("Address"), Qt::DisplayRole);
+
                 break;
+            }
             case QEvent::LocaleChange:
                 loadLanguage(QLocale::system().name());
                 break;
@@ -523,10 +534,9 @@ void MainWindow::createLanguageMenu()
             locale.truncate(locale.lastIndexOf('.')); // Remove file extension.
 
             QString lang{QLocale::languageToString(QLocale(locale).language())};
+            QIcon   langIcon(QString("%1/icons/%2.svg").arg(langPath_, locale));
 
-            QIcon ico(QString("%1/icons/%2.svg").arg(langPath_, locale));
-
-            QAction* action{new QAction(ico, lang, this)};
+            QAction* action{new QAction(langIcon, lang, this)};
             action->setCheckable(true);
             action->setData(locale);
 
