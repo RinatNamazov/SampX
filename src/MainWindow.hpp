@@ -77,6 +77,7 @@ private slots:
     void on_actionConnect_triggered();
     void on_actionAddServer_triggered();
     void on_actionDeleteServer_triggered();
+    void on_actionResetSorting_triggered();
 
     void on_connectButton_clicked();
 

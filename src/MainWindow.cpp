@@ -723,6 +723,16 @@ void MainWindow::on_actionDeleteServer_triggered()
     deleteServer(getCurrentRow());
 }
 
+void MainWindow::on_actionResetSorting_triggered()
+{
+    auto header{ui_->servers->horizontalHeader()};
+    header->setSortIndicatorShown(false);
+    ui_->servers->setSortingEnabled(false);
+    serversProxyModel_->sort(-1);
+    ui_->servers->verticalHeader()->setSectionsMovable(true);
+    ui_->actionResetSorting->setEnabled(false);
+}
+
 void MainWindow::on_connectButton_clicked()
 {
     launchGameWithServerOnRow(getCurrentRow());
@@ -913,14 +923,13 @@ void MainWindow::on_servers_doubleClicked(const QModelIndex& index)
 
 void MainWindow::on_servers_sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)
 {
-    auto header{ui_->servers->horizontalHeader()};
-    header->setSortIndicatorShown(true);
-    ui_->servers->setSortingEnabled(true);
-    ui_->servers->verticalHeader()->setSectionsMovable(false);
-    QObject::disconnect(header,
-                        &QHeaderView::sortIndicatorChanged,
-                        this,
-                        &MainWindow::on_servers_sortIndicatorChanged);
+    if (!ui_->servers->isSortingEnabled()) {
+        auto header{ui_->servers->horizontalHeader()};
+        header->setSortIndicatorShown(true);
+        ui_->servers->setSortingEnabled(true);
+        ui_->servers->verticalHeader()->setSectionsMovable(false);
+        ui_->actionResetSorting->setEnabled(true);
+    }
 }
 
 void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,

@@ -605,6 +605,8 @@
     <addaction name="separator"/>
     <addaction name="actionAddServer"/>
     <addaction name="actionDeleteServer"/>
+    <addaction name="separator"/>
+    <addaction name="actionResetSorting"/>
    </widget>
    <addaction name="menuHelp"/>
    <addaction name="menuSettings"/>
@@ -744,6 +746,14 @@
    </property>
    <property name="text">
     <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionResetSorting">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Reset sorting</string>
    </property>
   </action>
  </widget>
