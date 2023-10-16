@@ -1023,7 +1023,7 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
             editPasswordAction = menu.addAction(tr("Edit password"));
         }
     }
-    
+
     QAction* action{menu.exec(ui_->servers->viewport()->mapToGlobal(pos))};
     if (action == nullptr) {
         return;
@@ -1036,7 +1036,7 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
 
         bool    ok{false};
         QString pass = QInputDialog::getText(this,
-                                             tr("Add server"),
+                                             tr("Edit server password"),
                                              tr("Enter server password"),
                                              QLineEdit::Normal,
                                              srv.password,
@@ -1403,15 +1403,30 @@ void MainWindow::launchGameWithServerOnRow(int row)
         return;
     }
 
+    auto hostnameItem{getItemFromTable(row, 0)};
+
     QString address, password;
     if (ui_->group->currentIndex() == INDEX_INTERNET_GROUP) {
         address = getItemFromTable(row, 5)->text();
     } else {
-        quint32 serverId{getItemFromTable(row, 0)->data(Qt::UserRole).value<quint32>()};
+        quint32 serverId{hostnameItem->data(Qt::UserRole).value<quint32>()};
         auto    srv{config_.getServer(serverId)};
 
         address  = srv.address;
         password = srv.password;
+    }
+
+    if (hostnameItem->foreground().color() == ClosedServersColor && password.isEmpty()) {
+        bool ok{false};
+        password = QInputDialog::getText(this,
+                                         tr("Server password"),
+                                         tr("Enter server password"),
+                                         QLineEdit::Normal,
+                                         "",
+                                         &ok);
+        if (!ok || password.isEmpty()) {
+            return;
+        }
     }
 
     // Todo: Frequently extracting the port from the address, refactor later.
