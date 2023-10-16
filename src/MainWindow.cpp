@@ -708,6 +708,21 @@ void MainWindow::on_actionPingInterval_triggered()
     pingTimer_->setInterval(interval);
 }
 
+void MainWindow::on_actionConnect_triggered()
+{
+    on_connectButton_clicked();
+}
+
+void MainWindow::on_actionAddServer_triggered()
+{
+    on_addServerButton_clicked();
+}
+
+void MainWindow::on_actionDeleteServer_triggered()
+{
+    deleteServer(getCurrentRow());
+}
+
 void MainWindow::on_connectButton_clicked()
 {
     launchGameWithServerOnRow(getCurrentRow());
@@ -940,6 +955,8 @@ void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
     }
 
     ui_->connectButton->setEnabled(true);
+    ui_->actionConnect->setEnabled(true);
+    ui_->actionDeleteServer->setEnabled(true);
 
     pingServerInTable(current.row());
 }
@@ -1001,30 +1018,7 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
     }
 
     if (deleteAction != nullptr && action == deleteAction) { // Delete
-        config_.deleteServer(curServerId);
-
-        QModelIndex proxyIndex{serversProxyModel_->index(curServerIndex, 0)};
-        QModelIndex sourceIndex{serversProxyModel_->mapToSource(proxyIndex)};
-        for (int i{sourceIndex.row()}; i < serversModel_->rowCount(); ++i) {
-            auto    hostnameItem{serversModel_->item(i, 0)};
-            quint32 serverId{hostnameItem->data(Qt::UserRole).value<quint32>()};
-            hostnameItem->setData(QVariant::fromValue(serverId - 1), Qt::UserRole);
-        }
-
-        int curGroupIndex{ui_->group->currentIndex()};
-        if (curGroupIndex == INDEX_INTERNET_GROUP) {
-            return;
-        }
-
-        QVariant userData{addressRow->data(Qt::UserRole)};
-        if (!userData.isNull()) {
-            auto sq{userData.value<SampQuery*>()};
-            if (sq != nullptr) {
-                delete sq;
-            }
-        }
-
-        serversModel_->removeRow(sourceIndex.row());
+        deleteServer(curServerIndex);
     } else if (editPasswordAction != nullptr && action == editPasswordAction) { // Edit password
         auto srv{config_.getServer(curServerId)};
 
@@ -1485,4 +1479,38 @@ void MainWindow::launchGame(const QString& address, const QString& password)
     gameLauncher_.replaceSampLibrary(sampDllName);
 
     gameLauncher_.launch();
+}
+
+void MainWindow::deleteServer(int tableIndex)
+{
+    if (tableIndex == -1) {
+        return;
+    }
+
+    if (ui_->group->currentIndex() == INDEX_INTERNET_GROUP) {
+        return;
+    }
+
+    quint32 curServerId{getItemFromTable(tableIndex, 0)->data(Qt::UserRole).value<quint32>()};
+
+    config_.deleteServer(curServerId);
+
+    QModelIndex proxyIndex{serversProxyModel_->index(tableIndex, 0)};
+    QModelIndex sourceIndex{serversProxyModel_->mapToSource(proxyIndex)};
+    for (int i{sourceIndex.row()}; i < serversModel_->rowCount(); ++i) {
+        auto    hostnameItem{serversModel_->item(i, 0)};
+        quint32 serverId{hostnameItem->data(Qt::UserRole).value<quint32>()};
+        hostnameItem->setData(QVariant::fromValue(serverId - 1), Qt::UserRole);
+    }
+
+    auto     addressRow{getItemFromTable(tableIndex, 5)};
+    QVariant userData{addressRow->data(Qt::UserRole)};
+    if (!userData.isNull()) {
+        auto sq{userData.value<SampQuery*>()};
+        if (sq != nullptr) {
+            delete sq;
+        }
+    }
+
+    serversModel_->removeRow(sourceIndex.row());
 }

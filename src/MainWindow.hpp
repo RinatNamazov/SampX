@@ -74,6 +74,10 @@ private slots:
 
     void on_actionPingInterval_triggered();
 
+    void on_actionConnect_triggered();
+    void on_actionAddServer_triggered();
+    void on_actionDeleteServer_triggered();
+
     void on_connectButton_clicked();
 
     void on_search_textChanged(const QString& text);
@@ -146,4 +150,6 @@ private:
 
     void launchGameWithServerOnRow(int row);
     void launchGame(const QString& address, const QString& password);
+
+    void deleteServer(int tableIndex);
 };

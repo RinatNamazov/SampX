@@ -141,6 +141,9 @@
             <attribute name="verticalHeaderVisible">
              <bool>true</bool>
             </attribute>
+            <attribute name="verticalHeaderCascadingSectionResizes">
+             <bool>false</bool>
+            </attribute>
             <attribute name="verticalHeaderMinimumSectionSize">
              <number>24</number>
             </attribute>
@@ -501,7 +504,7 @@
          <item>
           <widget class="QPushButton" name="connectButton">
            <property name="enabled">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="minimumSize">
             <size>
@@ -594,8 +597,18 @@
     <addaction name="actionSaveLastWindowPosition"/>
     <addaction name="actionSaveLastColumnWidth"/>
    </widget>
+   <widget class="QMenu" name="menuServers">
+    <property name="title">
+     <string>Servers</string>
+    </property>
+    <addaction name="actionConnect"/>
+    <addaction name="separator"/>
+    <addaction name="actionAddServer"/>
+    <addaction name="actionDeleteServer"/>
+   </widget>
    <addaction name="menuHelp"/>
    <addaction name="menuSettings"/>
+   <addaction name="menuServers"/>
   </widget>
   <action name="actionCheckForUpdates">
    <property name="text">
@@ -710,6 +723,27 @@
   <action name="actionSpecifyGameDirectory">
    <property name="text">
     <string>Specify game directory</string>
+   </property>
+  </action>
+  <action name="actionAddServer">
+   <property name="text">
+    <string>Add server</string>
+   </property>
+  </action>
+  <action name="actionDeleteServer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Delete server</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Connect</string>
    </property>
   </action>
  </widget>
