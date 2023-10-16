@@ -557,6 +557,12 @@ int SettingsData::findServerByAddress(const QString& address, const quint32 grou
     return -1;
 }
 
+void SettingsData::moveServer(quint32 from, quint32 to)
+{
+    auto movedItem{servers_.takeAt(from)};
+    servers_.insert(to, movedItem);
+}
+
 quint32 SettingsData::getProfileCount() const
 {
     return profiles_.count();

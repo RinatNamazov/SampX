@@ -85,6 +85,7 @@ private slots:
     void on_deleteGroupButton_clicked();
     void on_addServerButton_clicked();
 
+    void on_servers_sectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void on_servers_doubleClicked(const QModelIndex& index);
     void on_servers_sortIndicatorChanged(int logicalIndex, Qt::SortOrder order);
     void on_servers_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);

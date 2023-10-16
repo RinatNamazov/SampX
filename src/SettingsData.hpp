@@ -112,6 +112,7 @@ public:
     quint32 addServer(Server server);
     void    deleteServer(quint32 id);
     int     findServerByAddress(const QString& address, const quint32 group = -1) const;
+    void    moveServer(quint32 from, quint32 to);
 
     quint32 getProfileCount() const;
     Profile getProfile(quint32 id) const;

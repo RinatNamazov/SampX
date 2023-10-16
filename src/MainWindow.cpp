@@ -113,6 +113,15 @@ MainWindow::MainWindow(QWidget* parent)
     ui_->servers->setModel(serversProxyModel_);
     ui_->servers->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    auto verticalHeader{ui_->servers->verticalHeader()};
+    verticalHeader->setSectionResizeMode(QHeaderView::ResizeMode::Fixed);
+    verticalHeader->setSectionsMovable(true);
+
+    QObject::connect(verticalHeader,
+                     &QHeaderView::sectionMoved,
+                     this,
+                     &MainWindow::on_servers_sectionMoved);
+
     auto headerModel{new QStandardItemModel(1, 6)};
 
     headerModel->setHeaderData(0, Qt::Horizontal, tr("HostName"), Qt::DisplayRole);
@@ -706,6 +715,9 @@ void MainWindow::on_connectButton_clicked()
 
 void MainWindow::on_search_textChanged(const QString& text)
 {
+    if (!ui_->servers->isSortingEnabled()) {
+        ui_->servers->verticalHeader()->setSectionsMovable(text.trimmed().isEmpty());
+    }
     serversProxyModel_->setFilterFixedString(text);
 }
 
@@ -868,6 +880,14 @@ void MainWindow::on_addServerButton_clicked()
     }
 }
 
+void MainWindow::on_servers_sectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
+{
+    config_.moveServer(oldVisualIndex, newVisualIndex);
+
+    auto items{serversModel_->takeRow(oldVisualIndex)};
+    serversModel_->insertRow(newVisualIndex, items);
+}
+
 void MainWindow::on_servers_doubleClicked(const QModelIndex& index)
 {
     if (index.row() == -1) {
@@ -881,6 +901,7 @@ void MainWindow::on_servers_sortIndicatorChanged(int logicalIndex, Qt::SortOrder
     auto header{ui_->servers->horizontalHeader()};
     header->setSortIndicatorShown(true);
     ui_->servers->setSortingEnabled(true);
+    ui_->servers->verticalHeader()->setSectionsMovable(false);
     QObject::disconnect(header,
                         &QHeaderView::sortIndicatorChanged,
                         this,
