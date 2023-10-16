@@ -992,7 +992,8 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
     int     curGroupIndex{ui_->group->currentIndex()};
     quint32 curGroupId{getGroupOrProxyOrAdapterByIndex(curGroupIndex)};
 
-    quint32 curServerId{getItemFromTable(curServerIndex, 0)->data(Qt::UserRole).value<quint32>()};
+    auto    hostnameItem{getItemFromTable(curServerIndex, 0)};
+    quint32 curServerId{hostnameItem->data(Qt::UserRole).value<quint32>()};
     auto    curServer{config_.getServer(curServerId)};
     auto    addressRow{getItemFromTable(curServerIndex, 5)};
     QString curServerAddress{addressRow->text()};
@@ -1016,10 +1017,13 @@ void MainWindow::on_servers_customContextMenuRequested(const QPoint& pos)
     }
 
     if (curGroupIndex != INDEX_INTERNET_GROUP) {
-        deleteAction       = menu.addAction(tr("Delete"));
-        editPasswordAction = menu.addAction(tr("Edit password"));
-    }
+        deleteAction = menu.addAction(tr("Delete"));
 
+        if (hostnameItem->foreground().color() == ClosedServersColor) {
+            editPasswordAction = menu.addAction(tr("Edit password"));
+        }
+    }
+    
     QAction* action{menu.exec(ui_->servers->viewport()->mapToGlobal(pos))};
     if (action == nullptr) {
         return;
