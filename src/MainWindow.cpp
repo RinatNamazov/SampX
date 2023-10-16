@@ -169,29 +169,17 @@ MainWindow::MainWindow(QWidget* parent)
         ui_->profile->addItem(profile.name);
     }
 
-    quint32  currentProfile{0};
-    QVariant lastProfile{settings_->value("profile")};
-    if (lastProfile.isNull()) {
-        settings_->setValue("profile", currentProfile);
-    } else {
-        currentProfile = lastProfile.toUInt();
+    int lastProfile{settings_->value("profile", 0).toInt()};
+    if (lastProfile >= ui_->profile->count()) {
+        lastProfile = 0;
     }
-    if (currentProfile >= ui_->profile->count()) {
-        currentProfile = 0;
-    }
-    ui_->profile->setCurrentIndex(currentProfile);
+    ui_->profile->setCurrentIndex(lastProfile);
 
-    int  currentGroupIndex{0};
-    auto lastGroup{settings_->value("group")};
-    if (lastGroup.isNull()) {
-        settings_->setValue("group", currentGroupIndex);
-    } else {
-        currentGroupIndex = lastGroup.toInt();
+    int lastGroup{settings_->value("group", 0).toInt()};
+    if (lastGroup >= ui_->group->count()) {
+        lastGroup = 0;
     }
-    if (currentGroupIndex >= ui_->group->count()) {
-        currentGroupIndex = 0;
-    }
-    ui_->group->setCurrentIndex(currentGroupIndex);
+    ui_->group->setCurrentIndex(lastGroup);
 
     QObject::connect(&sampQuery_,
                      &SampQuery::masterServerResponded,
@@ -953,7 +941,8 @@ void MainWindow::on_servers_currentRowChanged(const QModelIndex& current,
     ui_->serverInfoBox->setTitle(tr("Server Information: ") + serverAddress);
     ui_->serverAddress->setText(serverAddress);
 
-    if (ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
+    if (ui_->actionProfileSystem->isChecked()
+        && ui_->group->currentIndex() != INDEX_INTERNET_GROUP) {
         quint32 serverId{getItemFromTable(current.row(), 0)->data(Qt::UserRole).value<quint32>()};
 
         auto srv{config_.getServer(serverId)};
