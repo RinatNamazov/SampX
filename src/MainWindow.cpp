@@ -47,25 +47,26 @@ bool CustomSortFilterProxyModel::lessThan(const QModelIndex& left, const QModelI
 {
     // Not available servers are always below. The only exception is for the addresses column.
     if (left.column() != 5 && right.column() != 5) {
-        bool leftOnline  = sourceModel()->data(left.siblingAtColumn(1)).toString().isEmpty();
-        bool rightOnline = sourceModel()->data(right.siblingAtColumn(1)).toString().isEmpty();
-        if (leftOnline && rightOnline) {
+        // If the online field is empty, then the server is unavailable.
+        bool leftHasOnline{sourceModel()->data(left.siblingAtColumn(1)).toString().isEmpty()};
+        bool righHasOnline{sourceModel()->data(right.siblingAtColumn(1)).toString().isEmpty()};
+        if (leftHasOnline && righHasOnline) {
             return false;
-        } else if (leftOnline && !rightOnline) {
+        } else if (leftHasOnline && !righHasOnline) {
             return sortOrder() != Qt::AscendingOrder;
-        } else if (!leftOnline && rightOnline) {
+        } else if (!leftHasOnline && righHasOnline) {
             return sortOrder() != Qt::DescendingOrder;
         }
 
         // Online.
         if (left.column() == 1 && right.column() == 1) {
-            QString leftString  = sourceModel()->data(left).toString();
-            QString rightString = sourceModel()->data(right).toString();
+            QString leftString{sourceModel()->data(left).toString()};
+            QString rightString{sourceModel()->data(right).toString()};
 
-            int leftValue  = leftString.split('/').first().trimmed().toInt();
-            int rightValue = rightString.split('/').first().trimmed().toInt();
+            int leftOnline{leftString.split('/').first().trimmed().toInt()};
+            int righOnline{rightString.split('/').first().trimmed().toInt()};
 
-            return leftValue < rightValue;
+            return leftOnline < righOnline;
         }
     }
 
@@ -146,7 +147,7 @@ MainWindow::MainWindow(QWidget* parent)
                      this,
                      &MainWindow::on_servers_sortIndicatorChanged);
 
-    auto selectionModel = ui_->servers->selectionModel();
+    auto selectionModel{ui_->servers->selectionModel()};
     QObject::connect(selectionModel,
                      &QItemSelectionModel::currentRowChanged,
                      this,
@@ -316,7 +317,7 @@ void MainWindow::masterServerResponded(const QStringList& servers)
 
 int MainWindow::getCurrentRow()
 {
-    auto rows = ui_->servers->selectionModel()->selectedRows();
+    auto rows{ui_->servers->selectionModel()->selectedRows()};
     if (!rows.isEmpty()) {
         return rows.first().row();
     }
@@ -325,8 +326,8 @@ int MainWindow::getCurrentRow()
 
 QStandardItem* MainWindow::getItemFromTable(int row, int column)
 {
-    QModelIndex proxyIndex  = serversProxyModel_->index(row, column);
-    QModelIndex sourceIndex = serversProxyModel_->mapToSource(proxyIndex);
+    QModelIndex proxyIndex{serversProxyModel_->index(row, column)};
+    QModelIndex sourceIndex{serversProxyModel_->mapToSource(proxyIndex)};
     return serversModel_->itemFromIndex(sourceIndex);
 }
 
@@ -427,7 +428,7 @@ void MainWindow::createDefaultConfig()
 {
     QSettings sampSettings{"HKEY_CURRENT_USER\\SOFTWARE\\SAMP", QSettings::NativeFormat};
 
-    quint32 gameDirId = -1, gameExeId = -1;
+    int     gameDirId{-1}, gameExeId{-1};
     QString gameExePath{sampSettings.value("gta_sa_exe").toString()};
     if (!gameExePath.isEmpty()) {
         QFileInfo gtaPath(gameExePath);
@@ -471,7 +472,7 @@ void MainWindow::createDefaultConfig()
     SampFavorites sf;
     if (sf.load(SampFavorites::getDefaultSampFilePath())) {
         for (quint32 i{0}; i < sf.getServersCount(); ++i) {
-            SampFavorites::Server server = sf.getServer(i);
+            SampFavorites::Server server{sf.getServer(i)};
 
             SettingsData::Server srv;
             srv.group    = favoritesId;
@@ -896,8 +897,8 @@ void MainWindow::on_addServerButton_clicked()
     }
     serversModel_->setItem(idx, 5, new QStandardItem(server.address));
 
-    QModelIndex sourceIndex = serversModel_->index(idx, 0);
-    QModelIndex proxyIndex  = serversProxyModel_->mapFromSource(sourceIndex);
+    QModelIndex sourceIndex{serversModel_->index(idx, 0)};
+    QModelIndex proxyIndex{serversProxyModel_->mapFromSource(sourceIndex)};
     if (proxyIndex.isValid()) {
         ui_->servers->setCurrentIndex(proxyIndex);
     }

@@ -653,7 +653,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Enable the profile system</string>
+    <string>Show profiles</string>
    </property>
   </action>
   <action name="actionSamp">
@@ -720,11 +720,6 @@
    </property>
    <property name="text">
     <string>Save the last column width</string>
-   </property>
-  </action>
-  <action name="actionSpecifyGameDirectory">
-   <property name="text">
-    <string>Specify game directory</string>
    </property>
   </action>
   <action name="actionAddServer">
