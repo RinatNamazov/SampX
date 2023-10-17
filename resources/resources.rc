@@ -1,0 +1,94 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resources.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian (Russia) resources
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+    LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+    #pragma code_page(1251)
+
+    #ifdef APSTUDIO_INVOKED
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // TEXTINCLUDE
+    //
+
+    1 TEXTINCLUDE BEGIN "resource.h\0" END
+
+    2 TEXTINCLUDE BEGIN "#include "
+                        "winres.h"
+                        "\r\n"
+                        "\0" END
+
+    3 TEXTINCLUDE BEGIN "\r\n"
+                        "\0" END
+
+    #endif // APSTUDIO_INVOKED
+#endif // Russian (Russia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+    LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+    #pragma code_page(1252)
+
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // Icon
+    //
+
+    // Icon with lowest ID value placed first to ensure application icon
+    // remains consistent on all systems.
+    IDI_ICON1 ICON "sampx_icon.ico"
+#endif // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+#define VER_FILEVERSION 1, 2, 0, 1
+#define VER_FILEVERSION_STR "1.2.0-beta"
+
+#define VER_PRODUCTVERSION 1, 2, 0, 1
+#define VER_PRODUCTVERSION_STR "1.2.0-beta"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION VER_FILEVERSION
+ PRODUCTVERSION VER_PRODUCTVERSION
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName", "RINWARES"
+            VALUE "FileDescription", "https://github.com/RinatNamazov/SampX"
+            VALUE "FileVersion", VER_FILEVERSION_STR
+            VALUE "InternalName", "SampX"
+            VALUE "LegalCopyright", "Copyright © 2021, 2023 RINWARES, Rinat Namazov"
+            VALUE "OriginalFilename", "SampX.exe"
+            VALUE "ProductName", "SampX"
+            VALUE "ProductVersion", VER_PRODUCTVERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
