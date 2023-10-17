@@ -4,7 +4,7 @@
  *  LICENSE:        See LICENSE in the top level directory
  *  FILE:           GameLauncher.cpp
  *  DESCRIPTION:    Game launcher
- *  COPYRIGHT:      (c) 2021 RINWARES <rinwares.com>
+ *  COPYRIGHT:      (c) 2021, 2023 RINWARES <rinwares.com>
  *  AUTHOR:         Rinat Namazov <rinat.namazov@rinwares.com>
  *
  *****************************************************************************/
@@ -88,6 +88,22 @@ void GameLauncher::setProxy(QPair<QString, QString> proxy)
 
 bool GameLauncher::launch()
 {
+    auto gameExePath{gameDir_.filePath(gameExe_)};
+    if (!QFile::exists(gameExePath)) {
+        QMessageBox::critical(nullptr,
+                              tr("Failed to start the game"),
+                              tr("The game executable file does not exist."));
+        return false;
+    }
+
+    auto sampDllPath{gameDir_.filePath(sampDll_)};
+    if (!QFile::exists(sampDllPath)) {
+        QMessageBox::critical(nullptr,
+                              tr("Failed to start the game"),
+                              tr("The SA-MP dll file does not exist."));
+        return false;
+    }
+
     QString commandLine{QString("-c -h %1 -p %2 -n %3").arg(ip_).arg(port_).arg(nickname_)};
     if (!password_.isEmpty()) {
         commandLine += QString(" -z %1").arg(password_);
@@ -104,7 +120,7 @@ bool GameLauncher::launch()
 
     STARTUPINFO startupInfo{{0}};
 
-    if (!CreateProcessA(gameDir_.filePath(gameExe_).toLocal8Bit().data(),
+    if (!CreateProcessA(gameExePath.toLocal8Bit().data(),
                         commandLine.toLocal8Bit().data(),
                         0,
                         0,
@@ -120,7 +136,7 @@ bool GameLauncher::launch()
         return false;
     }
 
-    if (!injectLibrary(gameDir_.filePath(sampDll_))) {
+    if (!injectLibrary(sampDllPath)) {
         TerminateProcess(processInfo_.hProcess, 0);
         return false;
     }
