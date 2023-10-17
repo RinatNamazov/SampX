@@ -28,7 +28,7 @@ SampQuery::SampQuery(const QString& address)
     : QObject()
     , sends_(0)
     , recived_(0)
-    , masterServerUrl_("http://lists.sa-mp.com/0.3.7/servers")
+    , masterServerUrl_("https://rinwares.com/sampx/api/servers")
 {
     if (!address.isEmpty()) {
         setAddress(address);
@@ -136,8 +136,7 @@ void SampQuery::handleHttpResponse(QNetworkReply* reply)
     if (!reply->error()) {
         if (reply->request().url() == masterServerUrl_) {
             QString answer{reply->readAll()};
-            auto    servers{answer.split("\n")};
-            servers.pop_back(); // Deleting the last transition to a new line.
+            auto    servers{answer.split('\n')};
 
             emit masterServerResponded(servers);
         }
