@@ -17,7 +17,7 @@ https://www.blast.hk/threads/105888/
   * Proxy, only works with [RiProxy](https://www.blast.hk/threads/91897/).
   * Game directory.
   * Name of the game's executable file.
-  * The version of the sampa.
+  * SA-MP version.
   * Comment.
 
 ![SampX_dark](https://user-images.githubusercontent.com/28570920/141757854-e8a04c00-6b98-4fae-bf7d-92d830762eb9.png)
